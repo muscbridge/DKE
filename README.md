@@ -13,11 +13,12 @@ to suit your own purposes.
 ### Executables
 The DKE executables for 32- and 64-bit Windows, 64-bit Linux, and 64-bit macOS 
 can be downloaded from the MUSC CBI website. If you want to run DKE this way 
-[click here to register to download DKE executables](http://academicdepartments.musc.edu/cbi/dki/dke-swreg.html).
+[click here to register and download DKE executables](http://academicdepartments.musc.edu/cbi/dki/dke-swreg.html).
 
 ### Source Code
-The source code can be downloaded from this site using either the Downloads menu 
-or via "git clone". For example, at the Linux or macOS command prompt:
+The source code can be downloaded from this site using either the Downloads 
+menu or via "git clone" (if you have a git client installed). For example, 
+at the Linux or macOS command prompt:
 ```
 $ git clone git@git.musc.edu:dal220/dke.git
 ```
