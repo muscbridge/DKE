@@ -2,6 +2,23 @@
 The Diffusional Kurtosis Estimator (DKE) is software for processing 
 Diffusional Kurtosis Imaging (DKI) data. 
 
+## Useful Links for DKE
+[Introduction to DKI](http://academicdepartments.musc.edu/cbi/dki/index.html)
+
+[DKI Protocols](http://academicdepartments.musc.edu/cbi/dki/protocols.html)
+
+[DKI Data Processing](http://academicdepartments.musc.edu/cbi/dki/dke.html)
+
+[Results](http://academicdepartments.musc.edu/cbi/dki/results.html)
+
+[FAQs](http://academicdepartments.musc.edu/cbi/dki/faq.html)
+
+[KIN](http://academicdepartments.musc.edu/cbi/dki/kin.html)
+
+[References](http://academicdepartments.musc.edu/cbi/dki/references.html)
+
+[Forum](https://www.nitrc.org/forum/?group_id=652)
+
 ## Downloading DKE
 DKE is written primarily in MATLAB. It can be run either from executables 
 or from source code. An advantage of running DKE from executables is that 
@@ -86,21 +103,3 @@ ans =
 
 The MEX files can then be moved to the appropriate directory ending in "mex", 
 for example linux64mex if you are using 64-bit Linux.
-
-
-## Useful Links for DKE
-[Introduction to DKI](http://academicdepartments.musc.edu/cbi/dki/index.html)
-
-[DKI Protocols](http://academicdepartments.musc.edu/cbi/dki/protocols.html)
-
-[DKI Data Processing](http://academicdepartments.musc.edu/cbi/dki/dke.html)
-
-[Results](http://academicdepartments.musc.edu/cbi/dki/results.html)
-
-[FAQs](http://academicdepartments.musc.edu/cbi/dki/faq.html)
-
-[KIN](http://academicdepartments.musc.edu/cbi/dki/kin.html)
-
-[References](http://academicdepartments.musc.edu/cbi/dki/references.html)
-
-[Forum](https://www.nitrc.org/forum/?group_id=652)
