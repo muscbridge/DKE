@@ -40,6 +40,7 @@ path. For example, if you want to run DKE in MATLAB on macOS:
 >> dke /path/to/dke_parameters.dat
 ```
 
+### Creating new MEX files
 Note that the previously-compiled MEX files might not work on your computer, 
 depending on the specific version of the operating system that you are using. 
 In that case, you need to recompile the MEX files yourself with MATLAB Coder.
