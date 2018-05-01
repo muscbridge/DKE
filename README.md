@@ -54,7 +54,7 @@ path. For example, if you want to run DKE in MATLAB on macOS:
 ```
 >> addpath /path/to/mfiles
 >> addpath /path/to/mac64mex
->> dke /path/to/dke_parameters.dat
+>> dke /path/to/DKEParameters.dat
 ```
 
 ### Creating new MEX files
