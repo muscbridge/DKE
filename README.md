@@ -9,15 +9,15 @@ Diffusional Kurtosis Imaging (DKI) data.
 
 [DKI Data Processing](http://academicdepartments.musc.edu/cbi/dki/dke.html)
 
-[Results](http://academicdepartments.musc.edu/cbi/dki/results.html)
+[DKE Results](http://academicdepartments.musc.edu/cbi/dki/results.html)
 
-[FAQs](http://academicdepartments.musc.edu/cbi/dki/faq.html)
+[DKE FAQs](http://academicdepartments.musc.edu/cbi/dki/faq.html)
 
-[KIN](http://academicdepartments.musc.edu/cbi/dki/kin.html)
+[KIN (Kurtosis Imaging Network)](http://academicdepartments.musc.edu/cbi/dki/kin.html)
 
-[References](http://academicdepartments.musc.edu/cbi/dki/references.html)
+[DKI References](http://academicdepartments.musc.edu/cbi/dki/references.html)
 
-[Forum](https://www.nitrc.org/forum/?group_id=652)
+[DKE Forum on NITRC](https://www.nitrc.org/forum/?group_id=652)
 
 ## Downloading DKE
 DKE is written primarily in MATLAB. It can be run either from executables 
