@@ -47,12 +47,18 @@ $ git pull
 
 ## Running DKE from source code in MATLAB
 Most of the source code for DKE is in the mfiles subdirectory, which should be 
-added to your MATLAB path. DKE makes use of MEX files (MATLAB executable files) 
-for speed. Previously-compiled MEX files are in the subdirectories that end in 
+added to your MATLAB path. The subdirectory that has the gradient vectors
+file that you use should be added to your MATLAB path, or else the full path 
+name of the gradient vectors file used should be specified in the fn_gradients 
+parameter in the input parameter file.
+
+DKE makes use of MEX files (MATLAB executable files) for speed. 
+Previously-compiled MEX files are in the subdirectories that end in 
 "*mex". To use these files, add the appropriate subdirectory to your MATLAB 
 path. For example, if you want to run DKE in MATLAB on macOS:
 ```
 >> addpath /path/to/mfiles
+>> addpath /path/to/gradientVectors
 >> addpath /path/to/mac64mex
 >> dke /path/to/DKEParameters.dat
 ```
