@@ -399,8 +399,15 @@ fprintf('Processing voxels... ')
 
 if feature('numCores') > 1
     
-    if matlabpool('size') <= 0
-        evalc('matlabpool open');
+    % Start a parallel pool, unless one has already been started
+    % Before MATLAB 2013b (MATLAB version 8.2), 'matlabpool open' starts a parallel pool
+    % For MATLAB 2013b and later, 'gcp' creates a parallel pool if one currently does not exist
+    if verLessThan('matlab', '8.2')
+        if matlabpool('size') <= 0
+            evalc('matlabpool open');
+        end
+    else
+        evalc('gcp');
     end
     
     if ~dti_method.dti_only
@@ -488,7 +495,13 @@ if feature('numCores') > 1
         
     end
     
-  evalc('matlabpool close');
+    % Shut down the parallel pool
+    if verLessThan('matlab', '8.2')
+        evalc('matlabpool close');
+    else
+        poolobj = gcp('nocreate');
+        evalc('delete(poolobj)');
+    end
 
 else
     
