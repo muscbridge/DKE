@@ -45,6 +45,14 @@ version on this site with "git pull":
 $ git pull
 ```
 
+## Prerequisites
+In order to run DKE from source code, you need to have MATLAB. The files
+dke_preprocess_bruker.m, dke_preprocess_dicom.m, and map_interpolate.m
+make calls to [SPM](http://www.fil.ion.ucl.ac.uk/spm/). So if your image
+files are in Bruker format or DICOM format, or if you interpolate the
+parametric maps, you will need SPM to be installed and in your MATLAB
+path.
+
 ## Running DKE from source code in MATLAB
 Most of the source code for DKE is in the mfiles subdirectory, which should be 
 added to your MATLAB path. The subdirectory that has the gradient vectors
