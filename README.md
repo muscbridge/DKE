@@ -22,10 +22,10 @@ Diffusional Kurtosis Imaging (DKI) data.
 ## Downloading DKE
 DKE is written primarily in MATLAB. It can be run either from executables 
 or from source code. An advantage of running DKE from executables is that 
-it can be run under the free MATLAB Compiler Runtime 2012a (MCR), whereas 
-MATLAB is needed for running DKE from source code. An advantage of running 
-DKE from source code is that you can modify your copy of the source code 
-to suit your own purposes.
+it can be run under the free MATLAB Compiler Runtime (MCR) R2012a (or R2013b 
+for OS X), whereas MATLAB is needed for running DKE from source code. 
+An advantage of running DKE from source code is that you can modify your 
+copy of the source code to suit your own purposes.
 
 ### Executables
 The DKE executables for 32- and 64-bit Windows, 64-bit Linux, and 64-bit macOS 
