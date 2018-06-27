@@ -1,4 +1,16 @@
-clear all
+function dke_preprocess_prisma(basedir, fn_params)
+
+% dke_preprocess_prisma Preprocess diffusional kurtosis imaging data (convert Siemens Prisma DICOM to NIfTI, coregister diffusion-weighted images, average images)
+
+if nargin ~= 2
+    fprintf('\nUsage: dke_preprocess_prisma basedir paramsfile\n')
+    fprintf('\nbasedir  input Prisma data folder')
+    fprintf('\nparamsfile  DKE processing parameters file; see included example\n\n')
+    return
+end
+
+warning('off','all')
+
 
 %move dicoms of interest to folder 'b12root/dicom_dke'
 
@@ -98,38 +110,6 @@ end
     Gradient1=Gradient(1:(round(end/2)),:);
     save(fullfile(b12root,'dke/gradient_dke.txt'),'Gradient1','-ASCII')
     
-    %% create ft and dke params files
-    
-    %dke params
-    fid=fopen('/Users/lewis/prisma/Scripts/dke_parameters.txt'); %Original file. CHANGE THIS
-    fout=fullfile(b12root,'dke/dke_parameters.txt');% new file 
-
-    fidout=fopen(fout,'w');
-
-	while(~feof(fid))
-    s=fgetl(fid);
-    s=strrep(s,'PATH_REPLACE',b12root); %s=strrep(s,'A201', subject_list{i}) replace subject
-    fprintf(fidout,'%s\n',s);
-%    disp(s)
-    end
-    fclose(fid);
-    fclose(fidout);
-    
-    %ft params
-    fid=fopen('/Users/lewis/prisma/Scripts/ft_parameters.txt'); %Original file. CHANGE THIS
-    fout=fullfile(b12root,'dke/ft_parameters.txt');% new file 
-
-    fidout=fopen(fout,'w');
-
-	while(~feof(fid))
-    s=fgetl(fid);
-    s=strrep(s,'PATH_REPLACE',b12root); %s=strrep(s,'A201', subject_list{i}) replace subject
-    fprintf(fidout,'%s\n',s);
-%    disp(s)
-    end
-    fclose(fid);
-    fclose(fidout);
-    
 
 %% coregister b0s to b0
     %ONLY USE WITH INTERLEAVED B0S
@@ -176,12 +156,7 @@ movefile([b12root '/nifti/combined/4D.nii'],[b12root '/dke/4D.nii'])
  img(isnan(img))=0;
  make_4D_nii(spm_vol([b12root '/dke/4D.nii']),img,'4D.nii');
 
-%% run DKE and DKE_FT
-
-    fn_params=fullfile(b12root, 'dke/dke_parameters.txt')
-    dke(fn_params)
-
-    FT_parameters=fullfile(b12root, 'dke/ft_parameters.txt')
-    dke_ft(FT_parameters)
+fprintf('complete.\n')
 
 end
+
