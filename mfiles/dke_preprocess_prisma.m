@@ -160,3 +160,37 @@ fprintf('complete.\n')
 
 end
 
+
+%--------------------------------------------------------------------------
+% co-register two b = 0 images
+%--------------------------------------------------------------------------
+
+function M=coregister(fn_target, fn_source, folder_other, fn_other_filt)
+
+fn_other = spm_select('fplist', folder_other, fn_other_filt);
+
+% coregistration and reslicing parameters
+estflg.cost_fun = 'nmi';
+estflg.sep      = [4 2];
+estflg.tol      = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
+estflg.fwhm     = [7 7];
+wrtflg        = spm_get_defaults('realign.write');
+wrtflg.interp   = 1;
+wrtflg.which    = [2 0];
+
+hdr_trg = spm_vol(fn_target);
+hdr_src = spm_vol(fn_source);
+
+x  = spm_coreg(hdr_trg, hdr_src, estflg);
+M  = inv(spm_matrix(x));
+MM = zeros(4, 4, size(fn_other, 1));
+for j=1:size(fn_other, 1)
+    MM(:,:,j) = spm_get_space(deblank(fn_other(j,:)));
+end
+for j = 1:size(fn_other, 1)
+    spm_get_space(deblank(fn_other(j,:)), M*MM(:,:,j));
+end;
+
+fn_other = char(fn_target, fn_other);
+spm_reslice(fn_other, wrtflg);
+
