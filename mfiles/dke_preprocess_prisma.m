@@ -12,30 +12,25 @@ end
 warning('off','all')
 
 
-%move dicoms of interest to folder 'b12root/dicom_dke'
-
-%subj_list={'ET_016'};
-%{'ET_017'}
-subj_list={'test'};	
-
-for i=1:length(subj_list)
-    b12root = ['/Users/lewis/prisma/' subj_list{i}];
+% Create intermediate_processing subdirectory
+    b12root = [basedir '/intermediate_processing'];
+    mkdir(b12root);
 
     %convert dcm to nii
     
-    eval(['!/Applications/MRIcroGL/dcm2niix -f %p ''' b12root '/dicom_dke'''])
+    eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
     
     %move new niis
     
     %this part is needed when you have an additional separate b0 sequence
 %     mkdir([b12root '/nifti/B0'])
-%     in=fullfile(b12root, 'dicom_dke', '*B0*.nii');
+%     in=fullfile(basedir, '*B0*.nii');
 %     out=fullfile(b12root, 'nifti/B0');
 %     copyfile(in,out);
 
     mkdir([b12root '/nifti/DKI1'])
-    file_in=dir(fullfile(b12root, 'dicom_dke', '*DKI*.nii'));
-    in=fullfile(b12root, 'dicom_dke', file_in(1).name);
+    file_in=dir(fullfile(basedir, '*DKI*.nii'));
+    in=fullfile(basedir, file_in(1).name);
     out=fullfile(b12root, 'nifti/DKI1', '4D.nii');
     copyfile(in,out);
     
@@ -102,7 +97,7 @@ end
     
     %% make gradient file
     
-    cd([b12root '/dicom_dke']);
+    cd(basedir);
     name=dir('*.bvec');
     A=importdata([name(1).name]);
     B=A(:,any(A));
@@ -157,8 +152,6 @@ movefile([b12root '/nifti/combined/4D.nii'],[b12root '/dke/4D.nii'])
  make_4D_nii(spm_vol([b12root '/dke/4D.nii']),img,'4D.nii');
 
 fprintf('complete.\n')
-
-end
 
 
 %--------------------------------------------------------------------------
