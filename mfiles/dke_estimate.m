@@ -1922,7 +1922,11 @@ for islice = 1:img_size(3)
     tif(:,:,1) = rot90(squeeze(r(:, :, islice)), 1);
     tif(:,:,2) = rot90(squeeze(g(:, :, islice)), 1);
     tif(:,:,3) = rot90(squeeze(b(:, :, islice)), 1);
-    imwrite(tif, [fn_out sprintf('%03d', islice), '.tif']);
+    if (islice == 1)
+        imwrite(tif, [fn_out '.tif']);
+    else
+        imwrite(tif, [fn_out '.tif'], 'WriteMode', 'append');
+    end
 end
 
 
