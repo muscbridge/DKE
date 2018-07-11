@@ -15,29 +15,29 @@ warning('off','all')
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
 
-    b12root = [basedir '/intermediate_processing'];
-    mkdir(b12root);
+b12root = [basedir '/intermediate_processing'];
+mkdir(b12root);
 
-    eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
-    
+eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
+
 % move new NIfTI files to intermediate_processing/nifti
-    
+
 % this part is needed when you have an additional separate b0 sequence
 %     mkdir([b12root '/nifti/B0'])
 %     in=fullfile(basedir, '*B0*.nii');
 %     out=fullfile(b12root, 'nifti/B0');
 %     copyfile(in,out);
 
-    mkdir([b12root '/nifti/DKI1'])
-    file_in=dir(fullfile(basedir, '*DKI*.nii'));
-    in=fullfile(basedir, file_in(1).name);
-    out=fullfile(b12root, 'nifti/DKI1', '4D.nii');
-    copyfile(in,out);
-    
+mkdir([b12root '/nifti/DKI1'])
+file_in=dir(fullfile(basedir, '*DKI*.nii'));
+in=fullfile(basedir, file_in(1).name);
+out=fullfile(b12root, 'nifti/DKI1', '4D.nii');
+copyfile(in,out);
+
 %--------------------------------------------------------------------------
 % Split 4D nii into 3D nii
 %--------------------------------------------------------------------------
-        
+
 % for separate b0
 % Vdir = dir(fullfile(b12root, 'nifti/B0', '*.nii'));
 % V=fullfile(b12root, 'nifti/B0', Vdir(1).name);
@@ -46,9 +46,9 @@ warning('off','all')
 Vdir = dir(fullfile(b12root, 'nifti/DKI1', '*.nii'));
 V=fullfile(b12root, 'nifti/DKI1', Vdir(1).name);
 Vo = spm_file_split(V,[b12root '/nifti/DKI1']);
-    
-    mkdir([b12root '/dke']);
-    
+
+mkdir([b12root '/dke']);
+
 %--------------------------------------------------------------------------
 % Denoise
 %--------------------------------------------------------------------------
@@ -60,18 +60,18 @@ command=['/usr/local/mrtrix3/bin/dwidenoise ''' b12root '/nifti/DKI1/4D.nii'' ''
 % Unring
 %--------------------------------------------------------------------------
 
-    DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D_DN.nii')));
-    list=dir(fullfile(b12root,'/nifti/DKI1','*00*'));
-    [dim1,dim2,dim3,dim4]=size(DN);
-   parfor j=1:dim4
+DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D_DN.nii')));
+list=dir(fullfile(b12root,'/nifti/DKI1','*00*'));
+[dim1,dim2,dim3,dim4]=size(DN);
+parfor j=1:dim4
     img(:,:,:,j)=unring(DN(:,:,:,j));
     hdr=spm_vol(fullfile(b12root,'nifti/DKI1',[list(j).name]));
     hdr.dt=[16 0];
     int=img(:,:,:,j);
     int(isnan(int))=0;
     spm_write_vol(hdr,int);
-   end
-    
+end
+
 %--------------------------------------------------------------------------
 % Rename NIfTI images (3D_vol#_bval.nii)
 %--------------------------------------------------------------------------
@@ -103,19 +103,18 @@ for l=1:length(list)
     out=fullfile(b12root, '/nifti/B0', list(l).name);
     movefile(in,out);
 end
-    
+
 %--------------------------------------------------------------------------
 % Make gradient file
 %--------------------------------------------------------------------------
-    
-    cd(basedir);
-    name=dir('*.bvec');
-    A=importdata([name(1).name]);
-    B=A(:,any(A));
-    Gradient=B';
-    Gradient1=Gradient(1:(round(end/2)),:);
-    save(fullfile(b12root,'dke/gradient_dke.txt'),'Gradient1','-ASCII')
-    
+
+cd(basedir);
+name=dir('*.bvec');
+A=importdata([name(1).name]);
+B=A(:,any(A));
+Gradient=B';
+Gradient1=Gradient(1:(round(end/2)),:);
+save(fullfile(b12root,'dke/gradient_dke.txt'),'Gradient1','-ASCII')
 
 %--------------------------------------------------------------------------
 % Coregister b0s to b0
@@ -128,12 +127,12 @@ end
 % fprintf('Co-registering images...\n')
 % fn_source = fullfile(b12root, 'nifti/B0', dirb0(1).name); % source file is the first b = 0 image in the series returned by the operating system
 % 
-%             fn_target = fullfile(b12root, 'nifti/DKI1', dirdki(1).name);   
+%             fn_target = fullfile(b12root, 'nifti/DKI1', dirdki(1).name);
 %             M=coregister(fn_target, fn_source, fullfile(b12root, 'nifti/B0'),'.nii');
 % 
 % delete(fullfile(b12root, 'nifti/DKI1', 'r*.nii'))
 % movefile(fullfile(b12root, 'nifti/B0/r*.nii'),fullfile(b12root, 'nifti/B0_coreg')); 
-% fprintf('Co-registration complete.\n')      
+% fprintf('Co-registration complete.\n')
 
 %--------------------------------------------------------------------------
 % Average b0's
@@ -164,9 +163,9 @@ files = dir([b12root '/nifti/combined/*.nii']);
 make_4D_nii([b12root '/nifti/combined'],{files.name},'4D.nii');
 movefile([b12root '/nifti/combined/4D.nii'],[b12root '/dke/4D.nii'])
 
- img=spm_read_vols(spm_vol([b12root '/dke/4D.nii']));
- img(isnan(img))=0;
- make_4D_nii(spm_vol([b12root '/dke/4D.nii']),img,'4D.nii');
+img=spm_read_vols(spm_vol([b12root '/dke/4D.nii']));
+img(isnan(img))=0;
+make_4D_nii(spm_vol([b12root '/dke/4D.nii']),img,'4D.nii');
 
 fprintf('complete.\n')
 
