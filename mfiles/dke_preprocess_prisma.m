@@ -31,7 +31,7 @@ eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
 mkdir([b12root '/nifti/DKI1'])
 file_in=dir(fullfile(basedir, '*DKI*.nii'));
 in=fullfile(basedir, file_in(1).name);
-out=fullfile(b12root, 'nifti/DKI1', '4D.nii');
+out=fullfile(b12root, 'nifti/DKI1', 'dki.nii');
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
@@ -46,6 +46,10 @@ copyfile(in,out);
 Vdir = dir(fullfile(b12root, 'nifti/DKI1', '*.nii'));
 V=fullfile(b12root, 'nifti/DKI1', Vdir(1).name);
 Vo = spm_file_split(V,[b12root '/nifti/DKI1']);
+
+in=fullfile(b12root, 'nifti/DKI1', 'dki.nii');
+out=fullfile(b12root, 'nifti/DKI1', '4D.nii');
+movefile(in,out);
 
 mkdir([b12root '/dke']);
 
@@ -73,7 +77,7 @@ parfor j=1:dim4
 end
 
 %--------------------------------------------------------------------------
-% Rename NIfTI images (3D_vol#_bval.nii)
+% Rename NIfTI images (dki_vol#_bval.nii)
 %--------------------------------------------------------------------------
 
 list=dir(fullfile(b12root,'/nifti/DKI1','*00*.nii'));
@@ -88,8 +92,7 @@ for k=[1 130:138](list);
 end
 
 for k=1:length(list)
-    [list(k).newname] = strrep(list(k).name,'4D', '3D');
-    [list(k).newname] = strrep(list(k).newname, '.nii', ['_' list(k).bval '.nii']);
+    [list(k).newname] = strrep(list(k).name, '.nii', ['_' list(k).bval '.nii']);
     movefile(fullfile(b12root,'/nifti/DKI1',list(k).name), fullfile(b12root,'/nifti/DKI1',list(k).newname));
 end
 
@@ -151,7 +154,7 @@ imgavg = imgavg / (length(list));
 
 mkdir(b12root, '/nifti/combined');
 hdr.dt=[16 0];
-hdr.fname = fullfile(b12root,'nifti/combined/B0_avg.nii');
+hdr.fname = fullfile(b12root,'nifti/combined/b0_avg.nii');
 imgavg(isnan(imgavg))=0;
 spm_write_vol(hdr, imgavg);
 
