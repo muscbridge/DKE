@@ -77,7 +77,7 @@ parfor j=1:dim4
 end
 
 %--------------------------------------------------------------------------
-% Read DICOM headers
+% Read DICOM headers from the DICOM files in basedir
 %--------------------------------------------------------------------------
 
 P = spm_select('fplist', basedir, '.*');  % fplist: list w/ full path
@@ -85,9 +85,15 @@ dicom_hdrs = spm_dicom_headers(P);
 
 %--------------------------------------------------------------------------
 % Get b values from the DICOM headers
+% For every image,
+%   If the sequence name from the header contains 'ep_b0', it's a b=0 image
+%   Otherwise if the sequence name contains 'ep', get the b value
+%     - b values are between 'b' and '#' (or 't') in the sequence name
+%   Otherwise (if the sequence name does not contain 'ep'), show an error
 %--------------------------------------------------------------------------
 
 list=dir(fullfile(b12root,'/nifti/DKI1','*00*.nii'));
+
 for k=1:length(dicom_hdrs)
     hdr = dicom_hdrs{k};
     if ~isempty(strfind(hdr.SequenceName, 'ep_b0'))
