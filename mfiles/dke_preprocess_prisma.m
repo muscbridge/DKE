@@ -84,19 +84,56 @@ P = spm_select('fplist', basedir, '.*');  % fplist: list w/ full path
 dicom_hdrs = spm_dicom_headers(P);
 
 %--------------------------------------------------------------------------
-% Rename NIfTI images (dki_vol#_bval.nii)
+% Get b values from the DICOM headers
 %--------------------------------------------------------------------------
 
 list=dir(fullfile(b12root,'/nifti/DKI1','*00*.nii'));
+for k=1:length(dicom_hdrs)
+    hdr = dicom_hdrs{k};
+    if ~isempty(strfind(hdr.SequenceName, 'ep_b0'))
+        bval = '0';
+    elseif ~isempty(strfind(hdr.SequenceName, 'ep'))
+        bval_start = strfind(hdr.SequenceName, 'b') + 1;
+        bval_end = strfind(hdr.SequenceName, '#') - 1;
+        if isempty(bval_end)      % if '#' was not found, assume that DWI was acquired for only one direction (transversal)
+            bval_end = strfind(hdr.SequenceName, 't') - 1;
+            if isempty(bval_end)  % if 't' was not found, issue an error message
+                error('Invalid gradient direction!')
+            end
+        end
+        bval = hdr.SequenceName(bval_start:bval_end);
+    else
+        error('Invalid sequence name in DICOM header! Sequence name must contain ''ep''!')
+    end
+    list(k).bval = ['b' bval];
+end
+
+%--------------------------------------------------------------------------
+% Rename NIfTI images (dki_vol#_bval.nii)
+%--------------------------------------------------------------------------
+
+list2=dir(fullfile(b12root,'/nifti/DKI1','*00*.nii'));
 for k=2:65(list);
-    list(k).bval = 'b1000';
+    list2(k).bval = 'b1000';
 end
 for k=66:129(list); 
-    list(k).bval = 'b2000';
+    list2(k).bval = 'b2000';
 end
 for k=[1 130:138](list);
-    list(k).bval = 'b0';
+    list2(k).bval = 'b0';
 end
+
+% Compare b values from the DICOM headers (list(k).bval) with
+% hard-coded b values (list2(k).bval) (hard-coded for the data set
+% I'm testing with)
+tf = [1:138];
+for k=1:length(list); tf(k) = strcmp(list(k).bval, list2(k).bval); end
+fprintf('Testing -- min(tf) should be 1:\n')
+fprintf('min(tf) = %d\n', min(tf))
+fprintf('Entering debugging mode -- type dbquit to exit\n')
+
+keyboard
+
 
 for k=1:length(list)
     [list(k).newname] = strrep(list(k).name, '.nii', ['_' list(k).bval '.nii']);
