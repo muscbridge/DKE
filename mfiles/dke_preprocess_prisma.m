@@ -111,7 +111,7 @@ for k=1:length(dicom_hdrs)
     else
         error('Invalid sequence name in DICOM header! Sequence name must contain ''ep''!')
     end
-    list(k).bval = ['b' bval];
+    list(k).bval = bval;
 end
 
 %--------------------------------------------------------------------------
@@ -119,7 +119,7 @@ end
 %--------------------------------------------------------------------------
 
 for k=1:length(list)
-    [list(k).newname] = strrep(list(k).name, '.nii', ['_' list(k).bval '.nii']);
+    [list(k).newname] = strrep(list(k).name, '.nii', ['_b' list(k).bval '.nii']);
     movefile(fullfile(b12root,'/nifti/DKI1',list(k).name), fullfile(b12root,'/nifti/DKI1',list(k).newname));
 end
 
