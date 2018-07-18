@@ -112,29 +112,6 @@ end
 % Rename NIfTI images (dki_vol#_bval.nii)
 %--------------------------------------------------------------------------
 
-list2=dir(fullfile(b12root,'/nifti/DKI1','*00*.nii'));
-for k=2:65(list);
-    list2(k).bval = 'b1000';
-end
-for k=66:129(list); 
-    list2(k).bval = 'b2000';
-end
-for k=[1 130:138](list);
-    list2(k).bval = 'b0';
-end
-
-% Compare b values from the DICOM headers (list(k).bval) with
-% hard-coded b values (list2(k).bval) (hard-coded for the data set
-% I'm testing with)
-tf = [1:138];
-for k=1:length(list); tf(k) = strcmp(list(k).bval, list2(k).bval); end
-fprintf('Testing -- min(tf) should be 1:\n')
-fprintf('min(tf) = %d\n', min(tf))
-fprintf('Entering debugging mode -- type dbquit to exit\n')
-
-keyboard
-
-
 for k=1:length(list)
     [list(k).newname] = strrep(list(k).name, '.nii', ['_' list(k).bval '.nii']);
     movefile(fullfile(b12root,'/nifti/DKI1',list(k).name), fullfile(b12root,'/nifti/DKI1',list(k).newname));
