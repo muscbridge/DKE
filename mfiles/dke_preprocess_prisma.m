@@ -22,6 +22,19 @@ end
 warning('off','all')
 
 %--------------------------------------------------------------------------
+% Read parameter file
+%--------------------------------------------------------------------------
+
+fid=fopen(fn_params);
+file = textscan(fid, '%s', 'delimiter', '\n', 'whitespace', '');
+for i = 1:length(file{1})
+    eval(file{1}{i})
+end
+fclose(fid);
+
+options = preprocess_options;
+
+%--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
 
