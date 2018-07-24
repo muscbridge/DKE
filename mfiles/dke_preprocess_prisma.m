@@ -34,6 +34,10 @@ fclose(fid);
 
 options = preprocess_options;
 
+if options.denoise_flag ~= 0 && options.denoise_flag ~= 1
+    error('Invalid ''denoise_flag'' parameter! ''denoise_flag'' must be 0 or 1.')
+end
+
 %--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
