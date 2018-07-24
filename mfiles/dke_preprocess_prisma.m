@@ -81,17 +81,26 @@ movefile(in,out);
 mkdir([b12root '/dke']);
 
 %--------------------------------------------------------------------------
-% Denoise
+% Denoise if denoise_flag = 1
 %--------------------------------------------------------------------------
 
-command=['/usr/local/mrtrix3/bin/dwidenoise ''' b12root '/nifti/DKI1/4D.nii'' ''' b12root '/nifti/DKI1/4D_DN.nii'' ' '-noise ''' b12root '/nifti/DKI1/noise.nii'''];
-[status,cmdout] = system(command);
+if options.denoise_flag == 1
+    command=['/usr/local/mrtrix3/bin/dwidenoise ''' b12root '/nifti/DKI1/4D.nii'' ''' b12root '/nifti/DKI1/4D_DN.nii'' ' '-noise ''' b12root '/nifti/DKI1/noise.nii'''];
+    [status,cmdout] = system(command);
+end
 
 %--------------------------------------------------------------------------
 % Unring
 %--------------------------------------------------------------------------
 
-DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D_DN.nii')));
+% If denoise_flag = 1, use the denoised volume 4D_DN.nii
+% Otherwise 4D_DN.nii does not exist, so use 4D.nii
+if options.denoise_flag == 1
+    DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D_DN.nii')));
+else
+    DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D.nii')));
+end
+
 list=dir(fullfile(b12root,'/nifti/DKI1','*00*'));
 [dim1,dim2,dim3,dim4]=size(DN);
 parfor j=1:dim4
