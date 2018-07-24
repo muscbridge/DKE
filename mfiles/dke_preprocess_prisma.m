@@ -2,10 +2,20 @@ function dke_preprocess_prisma(basedir, fn_params)
 
 % dke_preprocess_prisma Preprocess diffusional kurtosis imaging data (convert Siemens Prisma DICOM to NIfTI, coregister diffusion-weighted images, average images)
 
+%--------------------------------------------------------------------------
+% Check inputs
+%--------------------------------------------------------------------------
+
 if nargin ~= 2
     fprintf('\nUsage: dke_preprocess_prisma basedir paramsfile\n')
     fprintf('\nbasedir  input Prisma data folder')
     fprintf('\nparamsfile  DKE processing parameters file; see included example\n\n')
+    return
+end
+
+if ~exist(fn_params, 'file')
+    fprintf('\n')
+    fprintf('Input parameter file %s does not exist!\n\n', fn_params)
     return
 end
 
