@@ -85,8 +85,11 @@ mkdir([b12root '/dke']);
 %--------------------------------------------------------------------------
 
 if options.denoise_flag == 1
+    fprintf('Denoising data with dwidenoise (MRtrix)...\n')
     command=['/usr/local/mrtrix3/bin/dwidenoise ''' b12root '/nifti/DKI1/4D.nii'' ''' b12root '/nifti/DKI1/4D_DN.nii'' ' '-noise ''' b12root '/nifti/DKI1/noise.nii'''];
     [status,cmdout] = system(command);
+else
+    fprintf('Not denoising data\n')
 end
 
 %--------------------------------------------------------------------------
