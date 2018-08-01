@@ -83,8 +83,6 @@ in=fullfile(dki1_dir, 'dki.nii');
 out=fullfile(dki1_dir, '4D.nii');
 movefile(in,out);
 
-mkdir([b12root '/dke']);
-
 %--------------------------------------------------------------------------
 % Denoise if denoise_flag = 1
 %--------------------------------------------------------------------------
@@ -182,13 +180,16 @@ end
 % Make gradient file
 %--------------------------------------------------------------------------
 
+dke_dir = fullfile(b12root, 'dke');
+mkdir(dke_dir);
+
 cd(basedir);
 name=dir('*.bvec');
 A=importdata([name(1).name]);
 B=A(:,any(A));
 Gradient=B';
 Gradient1=Gradient(1:(round(end/2)),:);
-save(fullfile(b12root,'dke/gradient_dke.txt'),'Gradient1','-ASCII')
+save(fullfile(dke_dir, 'gradient_dke.txt'),'Gradient1','-ASCII')
 
 %--------------------------------------------------------------------------
 % Coregister b0s to b0
@@ -223,23 +224,25 @@ end
 
 imgavg = imgavg / (length(list));
 
-mkdir(b12root, '/nifti/combined');
+combined_dir = fullfile(nifti_dir, 'combined');
+mkdir(combined_dir);
+
 hdr.dt=[16 0];
-hdr.fname = fullfile(b12root,'nifti/combined/b0_avg.nii');
+hdr.fname = fullfile(combined_dir, 'b0_avg.nii');
 imgavg(isnan(imgavg))=0;
 spm_write_vol(hdr, imgavg);
 
 %--------------------------------------------------------------------------
 % Move DKI images and make 4D NIfTI images
 %--------------------------------------------------------------------------
-copyfile(fullfile(dki1_dir, '*00*'), [b12root '/nifti/combined']);
-files = dir([b12root '/nifti/combined/*.nii']);
-make_4D_nii([b12root '/nifti/combined'],{files.name},'4D.nii');
-movefile([b12root '/nifti/combined/4D.nii'],[b12root '/dke/4D.nii'])
+copyfile(fullfile(dki1_dir, '*00*'), combined_dir);
+files = dir(fullfile(combined_dir, '*.nii'));
+make_4D_nii(combined_dir, {files.name}, '4D.nii');
+movefile(fullfile(combined_dir, '4D.nii'), fullfile(dke_dir, '4D.nii'))
 
-img=spm_read_vols(spm_vol([b12root '/dke/4D.nii']));
+img=spm_read_vols(spm_vol(fullfile(dke_dir, '4D.nii')));
 img(isnan(img))=0;
-make_4D_nii(spm_vol([b12root '/dke/4D.nii']),img,'4D.nii');
+make_4D_nii(spm_vol(fullfile(dke_dir, '4D.nii')), img, '4D.nii');
 
 fprintf('complete.\n')
 
