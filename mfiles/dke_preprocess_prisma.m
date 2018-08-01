@@ -39,6 +39,12 @@ if options.denoise_flag ~= 0 && options.denoise_flag ~= 1
 end
 
 %--------------------------------------------------------------------------
+% Save current working directory
+%--------------------------------------------------------------------------
+
+orig_dir = pwd;
+
+%--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
 
@@ -243,6 +249,13 @@ movefile(fullfile(combined_dir, '4D.nii'), fullfile(dke_dir, '4D.nii'))
 img=spm_read_vols(spm_vol(fullfile(dke_dir, '4D.nii')));
 img(isnan(img))=0;
 make_4D_nii(spm_vol(fullfile(dke_dir, '4D.nii')), img, '4D.nii');
+
+%--------------------------------------------------------------------------
+% Return to original working directory
+%--------------------------------------------------------------------------
+
+cd(orig_dir);
+
 
 fprintf('complete.\n')
 
