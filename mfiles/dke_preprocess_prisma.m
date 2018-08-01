@@ -94,10 +94,17 @@ movefile(in,out);
 %--------------------------------------------------------------------------
 
 if options.denoise_flag == 1
-    fprintf('Denoising data with dwidenoise (MRtrix)...\n')
+    fprintf('Denoising data with dwidenoise (MRtrix)...  ')
     cd(dki1_dir);
     command=['/usr/local/mrtrix3/bin/dwidenoise 4D.nii 4D_DN.nii -noise noise.nii'];
     [status,cmdout] = system(command);
+    if status == 0
+        fprintf('done.\n')
+    else
+        fprintf('\nAn error occurred. Output of dwidenoise command:\n');
+        cmdout
+        error('Error running dwidenoise.')
+    end
 else
     fprintf('Not denoising data\n')
 end
