@@ -48,15 +48,16 @@ mkdir(b12root);
 nifti_dir = fullfile(b12root, 'nifti');
 mkdir(nifti_dir);
 
+b0_dir = fullfile(nifti_dir, 'B0');
+mkdir(b0_dir);
+
 eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
 
 % move new NIfTI files to subdirectories of nifti_dir
 
 % this part is needed when you have an additional separate b0 sequence
-%     mkdir([b12root '/nifti/B0'])
 %     in=fullfile(basedir, '*B0*.nii');
-%     out=fullfile(b12root, 'nifti/B0');
-%     copyfile(in,out);
+%     copyfile(in, b0_dir);
 
 dki1_dir = fullfile(nifti_dir, 'DKI1');
 mkdir(dki1_dir);
@@ -70,9 +71,9 @@ copyfile(in,out);
 %--------------------------------------------------------------------------
 
 % for separate b0
-% Vdir = dir(fullfile(b12root, 'nifti/B0', '*.nii'));
-% V=fullfile(b12root, 'nifti/B0', Vdir(1).name);
-% Vo = spm_file_split(V,[b12root '/nifti/B0']);
+% Vdir = dir(fullfile(b0_dir, '*.nii'));
+% V=fullfile(b0_dir, Vdir(1).name);
+% Vo = spm_file_split(V, b0_dir);
 
 Vdir = dir(fullfile(dki1_dir, '*.nii'));
 V=fullfile(dki1_dir, Vdir(1).name);
@@ -170,10 +171,10 @@ end
 
 clear list
 list=dir(fullfile(dki1_dir,'*b0*.nii'));
-mkdir([b12root '/nifti/B0']);
+
 for l=1:length(list)
     in=fullfile(dki1_dir,list(l).name);
-    out=fullfile(b12root, '/nifti/B0', list(l).name);
+    out=fullfile(b0_dir, list(l).name);
     movefile(in,out);
 end
 
@@ -194,28 +195,28 @@ save(fullfile(b12root,'dke/gradient_dke.txt'),'Gradient1','-ASCII')
 %--------------------------------------------------------------------------
 
 %ONLY USE WITH INTERLEAVED B0S
-% dirb0=dir(fullfile(b12root,'nifti/B0/*.nii'));
+% dirb0=dir(fullfile(b0_dir, '*.nii'));
 % dirdki=dir(fullfile(dki1_dir, '*.nii'));
 % 
 % fprintf('Co-registering images...\n')
-% fn_source = fullfile(b12root, 'nifti/B0', dirb0(1).name); % source file is the first b = 0 image in the series returned by the operating system
+% fn_source = fullfile(b0_dir, dirb0(1).name); % source file is the first b = 0 image in the series returned by the operating system
 % 
 %             fn_target = fullfile(dki1_dir, dirdki(1).name);
-%             M=coregister(fn_target, fn_source, fullfile(b12root, 'nifti/B0'),'.nii');
+%             M=coregister(fn_target, fn_source, b0_dir, '.nii');
 % 
 % delete(fullfile(dki1_dir, 'r*.nii'))
-% movefile(fullfile(b12root, 'nifti/B0/r*.nii'),fullfile(b12root, 'nifti/B0_coreg')); 
+% movefile(fullfile(b0_dir, 'r*.nii'), fullfile(b12root, 'nifti/B0_coreg'));
 % fprintf('Co-registration complete.\n')
 
 %--------------------------------------------------------------------------
 % Average b0's
 %--------------------------------------------------------------------------
-list = dir(fullfile(b12root,'nifti/B0/*.nii'));
-hdr = spm_vol(fullfile(b12root,'nifti/B0',list(1).name));
+list = dir(fullfile(b0_dir, '*.nii'));
+hdr = spm_vol(fullfile(b0_dir, list(1).name));
 
 imgavg = spm_read_vols(hdr);
 for j = 2:length(list)
-    hdr = spm_vol(fullfile(b12root,'nifti/B0',list(j).name));
+    hdr = spm_vol(fullfile(b0_dir, list(j).name));
     img = spm_read_vols(hdr);
     imgavg = imgavg + img;
 end
