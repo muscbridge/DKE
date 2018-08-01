@@ -95,7 +95,8 @@ movefile(in,out);
 
 if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...\n')
-    command=['/usr/local/mrtrix3/bin/dwidenoise ''' dki1_dir '/4D.nii'' ''' dki1_dir '/4D_DN.nii'' ' '-noise ''' dki1_dir '/noise.nii'''];
+    cd(dki1_dir);
+    command=['/usr/local/mrtrix3/bin/dwidenoise 4D.nii 4D_DN.nii -noise noise.nii'];
     [status,cmdout] = system(command);
 else
     fprintf('Not denoising data\n')
