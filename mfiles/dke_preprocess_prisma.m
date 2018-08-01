@@ -105,6 +105,16 @@ if options.denoise_flag == 1
         cmdout
         error('Error running dwidenoise.')
     end
+    fprintf('Calculating residuals with mrcalc (MRtrix)...  ')
+    command=['/usr/local/mrtrix3/bin/mrcalc 4D.nii 4D_DN.nii -subtract res.nii'];
+    [status,cmdout] = system(command);
+    if status == 0
+        fprintf('done.\n')
+    else
+        fprintf('\nAn error occurred. Output of mrcalc command:\n');
+        cmdout
+        error('Error running mrcalc.')
+    end
 else
     fprintf('Not denoising data\n')
 end
