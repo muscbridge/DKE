@@ -42,12 +42,15 @@ end
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
 
-b12root = [basedir '/intermediate_processing'];
+b12root = fullfile(basedir, 'intermediate_processing');
 mkdir(b12root);
+
+nifti_dir = fullfile(b12root, 'nifti');
+mkdir(nifti_dir);
 
 eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
 
-% move new NIfTI files to intermediate_processing/nifti
+% move new NIfTI files to subdirectories of nifti_dir
 
 % this part is needed when you have an additional separate b0 sequence
 %     mkdir([b12root '/nifti/B0'])
@@ -55,10 +58,11 @@ eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
 %     out=fullfile(b12root, 'nifti/B0');
 %     copyfile(in,out);
 
-mkdir([b12root '/nifti/DKI1'])
+dki1_dir = fullfile(nifti_dir, 'DKI1');
+mkdir(dki1_dir);
 file_in=dir(fullfile(basedir, '*DKI*.nii'));
 in=fullfile(basedir, file_in(1).name);
-out=fullfile(b12root, 'nifti/DKI1', 'dki.nii');
+out=fullfile(dki1_dir, 'dki.nii');
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
@@ -70,12 +74,12 @@ copyfile(in,out);
 % V=fullfile(b12root, 'nifti/B0', Vdir(1).name);
 % Vo = spm_file_split(V,[b12root '/nifti/B0']);
 
-Vdir = dir(fullfile(b12root, 'nifti/DKI1', '*.nii'));
-V=fullfile(b12root, 'nifti/DKI1', Vdir(1).name);
-Vo = spm_file_split(V,[b12root '/nifti/DKI1']);
+Vdir = dir(fullfile(dki1_dir, '*.nii'));
+V=fullfile(dki1_dir, Vdir(1).name);
+Vo = spm_file_split(V,dki1_dir);
 
-in=fullfile(b12root, 'nifti/DKI1', 'dki.nii');
-out=fullfile(b12root, 'nifti/DKI1', '4D.nii');
+in=fullfile(dki1_dir, 'dki.nii');
+out=fullfile(dki1_dir, '4D.nii');
 movefile(in,out);
 
 mkdir([b12root '/dke']);
@@ -86,7 +90,7 @@ mkdir([b12root '/dke']);
 
 if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...\n')
-    command=['/usr/local/mrtrix3/bin/dwidenoise ''' b12root '/nifti/DKI1/4D.nii'' ''' b12root '/nifti/DKI1/4D_DN.nii'' ' '-noise ''' b12root '/nifti/DKI1/noise.nii'''];
+    command=['/usr/local/mrtrix3/bin/dwidenoise ''' dki1_dir '/4D.nii'' ''' dki1_dir '/4D_DN.nii'' ' '-noise ''' dki1_dir '/noise.nii'''];
     [status,cmdout] = system(command);
 else
     fprintf('Not denoising data\n')
@@ -99,16 +103,16 @@ end
 % If denoise_flag = 1, use the denoised volume 4D_DN.nii
 % Otherwise 4D_DN.nii does not exist, so use 4D.nii
 if options.denoise_flag == 1
-    DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D_DN.nii')));
+    DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN.nii')));
 else
-    DN=spm_read_vols(spm_vol(fullfile(b12root,'/nifti/DKI1','4D.nii')));
+    DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D.nii')));
 end
 
-list=dir(fullfile(b12root,'/nifti/DKI1','*00*'));
+list=dir(fullfile(dki1_dir,'*00*'));
 [dim1,dim2,dim3,dim4]=size(DN);
 parfor j=1:dim4
     img(:,:,:,j)=unring(DN(:,:,:,j));
-    hdr=spm_vol(fullfile(b12root,'nifti/DKI1',[list(j).name]));
+    hdr=spm_vol(fullfile(dki1_dir,[list(j).name]));
     hdr.dt=[16 0];
     int=img(:,:,:,j);
     int(isnan(int))=0;
@@ -131,7 +135,7 @@ dicom_hdrs = spm_dicom_headers(P);
 %   Otherwise (if the sequence name does not contain 'ep'), show an error
 %--------------------------------------------------------------------------
 
-list=dir(fullfile(b12root,'/nifti/DKI1','*00*.nii'));
+list=dir(fullfile(dki1_dir,'*00*.nii'));
 
 for k=1:length(dicom_hdrs)
     hdr = dicom_hdrs{k};
@@ -159,16 +163,16 @@ end
 
 for k=1:length(list)
     [list(k).newname] = strrep(list(k).name, '.nii', ['_b' list(k).bval '.nii']);
-    movefile(fullfile(b12root,'/nifti/DKI1',list(k).name), fullfile(b12root,'/nifti/DKI1',list(k).newname));
+    movefile(fullfile(dki1_dir,list(k).name), fullfile(dki1_dir,list(k).newname));
 end
 
 % move b0s to folder 'intermediate_processing/nifti/b0'
 
 clear list
-list=dir(fullfile(b12root,'/nifti/DKI1','*b0*.nii'));
+list=dir(fullfile(dki1_dir,'*b0*.nii'));
 mkdir([b12root '/nifti/B0']);
 for l=1:length(list)
-    in=fullfile(b12root, 'nifti/DKI1',list(l).name);
+    in=fullfile(dki1_dir,list(l).name);
     out=fullfile(b12root, '/nifti/B0', list(l).name);
     movefile(in,out);
 end
@@ -191,15 +195,15 @@ save(fullfile(b12root,'dke/gradient_dke.txt'),'Gradient1','-ASCII')
 
 %ONLY USE WITH INTERLEAVED B0S
 % dirb0=dir(fullfile(b12root,'nifti/B0/*.nii'));
-% dirdki=dir(fullfile(b12root,'nifti/DKI1/*.nii'));
+% dirdki=dir(fullfile(dki1_dir, '*.nii'));
 % 
 % fprintf('Co-registering images...\n')
 % fn_source = fullfile(b12root, 'nifti/B0', dirb0(1).name); % source file is the first b = 0 image in the series returned by the operating system
 % 
-%             fn_target = fullfile(b12root, 'nifti/DKI1', dirdki(1).name);
+%             fn_target = fullfile(dki1_dir, dirdki(1).name);
 %             M=coregister(fn_target, fn_source, fullfile(b12root, 'nifti/B0'),'.nii');
 % 
-% delete(fullfile(b12root, 'nifti/DKI1', 'r*.nii'))
+% delete(fullfile(dki1_dir, 'r*.nii'))
 % movefile(fullfile(b12root, 'nifti/B0/r*.nii'),fullfile(b12root, 'nifti/B0_coreg')); 
 % fprintf('Co-registration complete.\n')
 
@@ -227,7 +231,7 @@ spm_write_vol(hdr, imgavg);
 %--------------------------------------------------------------------------
 % Move DKI images and make 4D NIfTI images
 %--------------------------------------------------------------------------
-copyfile([b12root '/nifti/DKI1/*00*'], [b12root '/nifti/combined']);
+copyfile(fullfile(dki1_dir, '*00*'), [b12root '/nifti/combined']);
 files = dir([b12root '/nifti/combined/*.nii']);
 make_4D_nii([b12root '/nifti/combined'],{files.name},'4D.nii');
 movefile([b12root '/nifti/combined/4D.nii'],[b12root '/dke/4D.nii'])
