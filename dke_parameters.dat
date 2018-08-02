@@ -10,6 +10,7 @@ preprocess_options.format = 'dicom';        		% input image format ('dicom', 'ni
 preprocess_options.navg = 2;                		% number of DKI series (default: 2); each DKI series must contain a b = 0 image followed by diffusion-weighted images; all series must use identical acquisition protocols (i.e., same diffusion weightings and gradient directions)
 preprocess_options.extra_b0 = 1;            		% whether (1) or not (0) there is an additional b = 0 series (default: 1); used when preprocess_options.format = 'dicom'
 preprocess_options.denoise_flag = 1;          		% whether (1) or not (0) to denoise the data
+preprocess_options.rician_corr_flag = 1;      		% whether (1) or not (0) to correct the data for Rician noise bias
 preprocess_options.coreg_flag = 1;          		% whether (1) or not (0) to perform 6-parameter rigid-body coregistration between diffusion-weighted images (default: 1); used when preprocess_options.format = 'dicom' or 'bruker'
 preprocess_options.series_description = {'DKI1' 'DKI2' 'DKI_B0'};  % list of dicom series descriptions; used when preprocess_options.format = 'dicom'
 preprocess_options.fn_nii = '4d.nii';       		% four-dimensional nifti image file name; no coregistration is performed between the diffusion-weighted images; used when preprocess_options.format = 'nifti'; the first image must be the b = 0 image
