@@ -124,13 +124,46 @@ else
 end
 
 %--------------------------------------------------------------------------
+% Correct for Rician noise bias if rician_corr_flag = 1 and denoise_flag = 1
+%--------------------------------------------------------------------------
+
+if options.denoise_flag == 1
+    if options.rician_corr_flag == 1
+        fprintf('Correcting for Rician noise bias...  ')
+        hdr_DN = spm_vol('4D_DN.nii');
+        DN = spm_read_vols(hdr_DN);
+        noise = spm_read_vols(spm_vol('noise.nii'));
+        DN = sqrt(DN.^2 - noise.^2);
+        DN = real(DN);
+        DN(isnan(DN)) = 0;
+        make_4D_nii(hdr_DN, DN, '4D_DN_rician_corrected.nii');
+        fprintf('done.\n')
+    else
+        fprintf('Not correcting for Rician noise bias\n')
+    end
+else
+    if options.rician_corr_flag == 1
+        fprintf('Not correcting for Rician noise bias (denoise_flag = 0)\n')
+    end
+end
+
+
+%--------------------------------------------------------------------------
 % Unring
 %--------------------------------------------------------------------------
 
-% If denoise_flag = 1, use the denoised volume 4D_DN.nii
-% Otherwise 4D_DN.nii does not exist, so use 4D.nii
+% If denoise_flag = 1 and rician_corr_flag = 1, use the denoised and Rician
+% noise bias corrected volume 4D_DN_rician_corrected.nii.
+% If denoise_flag = 1 and rician_corr_flag = 0, use the denoised
+% volume 4D_DN.nii.
+% Otherwise use 4D.nii.
+
 if options.denoise_flag == 1
-    DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN.nii')));
+    if options.rician_corr_flag == 1
+        DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN_rician_corrected.nii')));
+    else
+        DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN.nii')));
+    end
 else
     DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D.nii')));
 end
