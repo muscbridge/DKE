@@ -133,8 +133,7 @@ if options.denoise_flag == 1
         hdr_DN = spm_vol('4D_DN.nii');
         DN = spm_read_vols(hdr_DN);
         noise = spm_read_vols(spm_vol('noise.nii'));
-        DN = sqrt(DN.^2 - noise.^2);
-        DN = real(DN);
+        DN = sqrt(abs(DN.^2 - noise.^2));
         DN(isnan(DN)) = 0;
         make_4D_nii(hdr_DN, DN, '4D_DN_rician_corrected.nii');
         fprintf('done.\n')
