@@ -42,6 +42,14 @@ if options.rician_corr_flag ~= 0 && options.rician_corr_flag ~= 1
     error('Invalid ''rician_corr_flag'' parameter! ''rician_corr_flag'' must be 0 or 1.')
 end
 
+if options.gibbs_corr_flag ~= 0 && options.gibbs_corr_flag ~= 1
+    error('Invalid ''gibbs_corr_flag'' parameter! ''gibbs_corr_flag'' must be 0 or 1.')
+end
+
+if options.gibbs_corr_flag == 0
+    error('Not correcting for Gibbs artifact -- not supported yet')
+end
+
 %--------------------------------------------------------------------------
 % Save current working directory
 %--------------------------------------------------------------------------
@@ -157,25 +165,32 @@ end
 % volume 4D_DN.nii.
 % Otherwise use 4D.nii.
 
-if options.denoise_flag == 1
-    if options.rician_corr_flag == 1
-        DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN_rician_corrected.nii')));
+if options.gibbs_corr_flag == 1
+    fprintf('Correcting for Gibbs artifact...  ')
+    if options.denoise_flag == 1
+        if options.rician_corr_flag == 1
+            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN_rician_corrected.nii')));
+        else
+            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN.nii')));
+        end
     else
-        DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN.nii')));
+        DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D.nii')));
     end
-else
-    DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D.nii')));
-end
 
-list=dir(fullfile(dki1_dir,'*00*'));
-[dim1,dim2,dim3,dim4]=size(DN);
-parfor j=1:dim4
-    img(:,:,:,j)=unring(DN(:,:,:,j));
-    hdr=spm_vol(fullfile(dki1_dir,[list(j).name]));
-    hdr.dt=[16 0];
-    int=img(:,:,:,j);
-    int(isnan(int))=0;
-    spm_write_vol(hdr,int);
+    list=dir(fullfile(dki1_dir,'*00*'));
+    [dim1,dim2,dim3,dim4]=size(DN);
+    parfor j=1:dim4
+        img(:,:,:,j)=unring(DN(:,:,:,j));
+        hdr=spm_vol(fullfile(dki1_dir,[list(j).name]));
+        hdr.dt=[16 0];
+        int=img(:,:,:,j);
+        int(isnan(int))=0;
+        spm_write_vol(hdr,int);
+    end
+
+    fprintf('done.\n')
+else
+    error('Not correcting for Gibbs artifact -- not supported yet')
 end
 
 %--------------------------------------------------------------------------
