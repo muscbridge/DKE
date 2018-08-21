@@ -93,7 +93,8 @@ copyfile(in,out);
 % V=fullfile(b0_dir, Vdir(1).name);
 % Vo = spm_file_split(V, b0_dir);
 
-Vdir = dir(fullfile(dki1_dir, '*.nii'));
+cd(dki1_dir);
+Vdir = dir('*.nii');
 V=fullfile(dki1_dir, Vdir(1).name);
 Vo = spm_file_split(V,dki1_dir);
 
@@ -107,7 +108,6 @@ movefile(in,out);
 
 if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...  ')
-    cd(dki1_dir);
     command=['/usr/local/mrtrix3/bin/dwidenoise 4D.nii 4D_DN.nii -noise noise.nii'];
     [status,cmdout] = system(command);
     if status == 0
