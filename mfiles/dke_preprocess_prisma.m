@@ -108,7 +108,7 @@ movefile(in,out);
 
 if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...  ')
-    command=['/usr/local/mrtrix3/bin/dwidenoise 4D.nii 4D_DN.nii -noise noise.nii'];
+    command=['/usr/local/mrtrix3/bin/dwidenoise 4D.nii 4D_dn.nii -noise noise.nii'];
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
@@ -118,7 +118,7 @@ if options.denoise_flag == 1
         error('Error running dwidenoise.')
     end
     fprintf('Calculating residuals with mrcalc (MRtrix)...  ')
-    command=['/usr/local/mrtrix3/bin/mrcalc 4D.nii 4D_DN.nii -subtract res.nii'];
+    command=['/usr/local/mrtrix3/bin/mrcalc 4D.nii 4D_dn.nii -subtract res.nii'];
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
@@ -138,13 +138,13 @@ end
 if options.denoise_flag == 1
     if options.rician_corr_flag == 1
         fprintf('Correcting for Rician noise bias...  ')
-        hdr_DN = spm_vol('4D_DN.nii');
+        hdr_DN = spm_vol('4D_dn.nii');
         DN = spm_read_vols(hdr_DN);
         noise = spm_read_vols(spm_vol('noise.nii'));
         DN = sqrt(DN.^2 - noise.^2);
         DN = real(DN);
         DN(isnan(DN)) = 0;
-        make_4D_nii(hdr_DN, DN, '4D_DN_rician_corrected.nii');
+        make_4D_nii(hdr_DN, DN, '4D_dn_rc.nii');
         fprintf('done.\n')
     else
         fprintf('Not correcting for Rician noise bias\n')
@@ -161,18 +161,18 @@ end
 %--------------------------------------------------------------------------
 
 % If denoise_flag = 1 and rician_corr_flag = 1, use the denoised and Rician
-% noise bias corrected volume 4D_DN_rician_corrected.nii.
+% noise bias corrected volume 4D_dn_rc.nii.
 % If denoise_flag = 1 and rician_corr_flag = 0, use the denoised
-% volume 4D_DN.nii.
+% volume 4D_dn.nii.
 % Otherwise use 4D.nii.
 
 if options.gibbs_corr_flag == 1
     fprintf('Correcting for Gibbs artifact...  ')
     if options.denoise_flag == 1
         if options.rician_corr_flag == 1
-            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN_rician_corrected.nii')));
+            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_dn_rc.nii')));
         else
-            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_DN.nii')));
+            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_dn.nii')));
         end
     else
         DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D.nii')));
