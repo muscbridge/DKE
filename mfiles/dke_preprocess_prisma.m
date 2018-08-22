@@ -57,6 +57,22 @@ end
 orig_dir = pwd;
 
 %--------------------------------------------------------------------------
+% Set file names
+%
+% current_4D_file is the name of the file being preprocessed with denoising,
+% Rician bias correction, and Gibbs ringing artifact correction (depending
+% on settings of flags in the preprocess_options struct) and changes
+% after each preprocessing step
+%--------------------------------------------------------------------------
+
+dki_file = 'dki.nii';
+current_4D_file = '4D.nii';
+denoised_file = '4D_dn.nii';
+noise_file = 'noise.nii';
+residual_file = 'res.nii';
+rician_corrected_file = '4D_dn_rc.nii';
+
+%--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
 
@@ -81,7 +97,7 @@ dki1_dir = fullfile(nifti_dir, 'DKI1');
 mkdir(dki1_dir);
 file_in=dir(fullfile(basedir, '*DKI*.nii'));
 in=fullfile(basedir, file_in(1).name);
-out=fullfile(dki1_dir, 'dki.nii');
+out=fullfile(dki1_dir, dki_file);
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
@@ -98,8 +114,8 @@ Vdir = dir('*.nii');
 V=fullfile(dki1_dir, Vdir(1).name);
 Vo = spm_file_split(V,dki1_dir);
 
-in=fullfile(dki1_dir, 'dki.nii');
-out=fullfile(dki1_dir, '4D.nii');
+in=fullfile(dki1_dir, dki_file);
+out=fullfile(dki1_dir, current_4D_file);
 movefile(in,out);
 
 %--------------------------------------------------------------------------
@@ -108,7 +124,7 @@ movefile(in,out);
 
 if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...  ')
-    command=['/usr/local/mrtrix3/bin/dwidenoise 4D.nii 4D_dn.nii -noise noise.nii'];
+    command=['/usr/local/mrtrix3/bin/dwidenoise ' current_4D_file  ' ' denoised_file ' -noise ' noise_file];
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
@@ -118,7 +134,7 @@ if options.denoise_flag == 1
         error('Error running dwidenoise.')
     end
     fprintf('Calculating residuals with mrcalc (MRtrix)...  ')
-    command=['/usr/local/mrtrix3/bin/mrcalc 4D.nii 4D_dn.nii -subtract res.nii'];
+    command=['/usr/local/mrtrix3/bin/mrcalc ' current_4D_file  ' ' denoised_file ' -subtract ' residual_file];
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
@@ -127,6 +143,7 @@ if options.denoise_flag == 1
         cmdout
         error('Error running mrcalc.')
     end
+    current_4D_file = denoised_file;  % The file being processed is now the denoised file
 else
     fprintf('Not denoising data\n')
 end
@@ -138,14 +155,15 @@ end
 if options.denoise_flag == 1
     if options.rician_corr_flag == 1
         fprintf('Correcting for Rician noise bias...  ')
-        hdr_DN = spm_vol('4D_dn.nii');
+        hdr_DN = spm_vol(current_4D_file);
         DN = spm_read_vols(hdr_DN);
-        noise = spm_read_vols(spm_vol('noise.nii'));
+        noise = spm_read_vols(spm_vol(noise_file));
         DN = sqrt(DN.^2 - noise.^2);
         DN = real(DN);
         DN(isnan(DN)) = 0;
-        make_4D_nii(hdr_DN, DN, '4D_dn_rc.nii');
+        make_4D_nii(hdr_DN, DN, rician_corrected_file);
         fprintf('done.\n')
+        current_4D_file = rician_corrected_file;  % The file being processed is now the Rician bias corrected file
     else
         fprintf('Not correcting for Rician noise bias\n')
     end
@@ -168,15 +186,7 @@ end
 
 if options.gibbs_corr_flag == 1
     fprintf('Correcting for Gibbs artifact...  ')
-    if options.denoise_flag == 1
-        if options.rician_corr_flag == 1
-            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_dn_rc.nii')));
-        else
-            DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D_dn.nii')));
-        end
-    else
-        DN=spm_read_vols(spm_vol(fullfile(dki1_dir,'4D.nii')));
-    end
+    DN=spm_read_vols(spm_vol(fullfile(dki1_dir, current_4D_file)));
 
     list=dir(fullfile(dki1_dir,'*00*'));
     [dim1,dim2,dim3,dim4]=size(DN);
