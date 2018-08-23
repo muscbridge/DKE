@@ -125,6 +125,8 @@ if options.denoise_flag == 1
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
+        fprintf('\t- denoised output file is %s.\n', denoised_file)
+        fprintf('\t- noise estimate output file is %s.\n', noise_file)
     else
         fprintf('\nAn error occurred. Output of dwidenoise command:\n');
         cmdout
@@ -135,6 +137,7 @@ if options.denoise_flag == 1
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
+        fprintf('\t- residual output file is %s.\n', residual_file)
     else
         fprintf('\nAn error occurred. Output of mrcalc command:\n');
         cmdout
@@ -160,6 +163,7 @@ if options.denoise_flag == 1
         DN(isnan(DN)) = 0;
         make_4D_nii(hdr_DN, DN, rician_corrected_file);
         fprintf('done.\n')
+        fprintf('\t- Rician noise bias corrected output file is %s.\n', rician_corrected_file)
         current_4D_file = rician_corrected_file;  % The file being processed is now the Rician bias corrected file
     else
         fprintf('Not correcting for Rician noise bias\n')
@@ -186,6 +190,7 @@ if options.gibbs_corr_flag == 1
     [status,cmdout] = system(command);
     if status == 0
         fprintf('done.\n')
+        fprintf('\t- Gibbs ringing artifact corrected output file is %s.\n', gibbs_corrected_file)
     else
         fprintf('\nAn error occurred. Output of mrdegibbs command:\n');
         cmdout
