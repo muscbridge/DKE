@@ -46,10 +46,6 @@ if options.gibbs_corr_flag ~= 0 && options.gibbs_corr_flag ~= 1
     error('Invalid ''gibbs_corr_flag'' parameter! ''gibbs_corr_flag'' must be 0 or 1.')
 end
 
-if options.gibbs_corr_flag == 0
-    error('Not correcting for Gibbs artifact -- not supported yet')
-end
-
 %--------------------------------------------------------------------------
 % Save current working directory
 %--------------------------------------------------------------------------
@@ -198,7 +194,7 @@ if options.gibbs_corr_flag == 1
     current_4D_file = gibbs_corrected_file;  % The file being processed is now the Gibbs corrected file
 
 else
-    error('Not correcting for Gibbs artifact -- not supported yet')
+    fprintf('Not correcting for Gibbs artifact\n')
 end
 
 %--------------------------------------------------------------------------
