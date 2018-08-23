@@ -179,7 +179,8 @@ end
 %--------------------------------------------------------------------------
 
 if options.gibbs_corr_flag == 1
-    fprintf('Correcting for Gibbs ringing artifact...  ')
+    fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
+    fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
 
     % Generate the output file name from appending '_gr' to
     % the input file name, before the '.nii'
