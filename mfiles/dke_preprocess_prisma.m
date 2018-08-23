@@ -71,6 +71,7 @@ denoised_file = '4D_dn.nii';
 noise_file = 'noise.nii';
 residual_file = 'res.nii';
 rician_corrected_file = '4D_dn_rc.nii';
+%gibbs_corrected_file = '4D_gc.nii';  % File name generated below
 
 %--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
@@ -101,7 +102,7 @@ out=fullfile(dki1_dir, dki_file);
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
-% Split 4D nii into 3D nii
+% Switch to dki1_dir and rename dki_file to current_4D_file
 %--------------------------------------------------------------------------
 
 % for separate b0
@@ -110,9 +111,9 @@ copyfile(in,out);
 % Vo = spm_file_split(V, b0_dir);
 
 cd(dki1_dir);
-Vdir = dir('*.nii');
-V=fullfile(dki1_dir, Vdir(1).name);
-Vo = spm_file_split(V,dki1_dir);
+%   Vdir = dir('*.nii');
+%   V=fullfile(dki1_dir, Vdir(1).name);
+%   Vo = spm_file_split(V,dki1_dir);
 
 in=fullfile(dki1_dir, dki_file);
 out=fullfile(dki1_dir, current_4D_file);
@@ -173,36 +174,46 @@ else
     end
 end
 
-
 %--------------------------------------------------------------------------
-% Unring
+% Correct for Gibbs ringing artifact
 %--------------------------------------------------------------------------
-
-% If denoise_flag = 1 and rician_corr_flag = 1, use the denoised and Rician
-% noise bias corrected volume 4D_dn_rc.nii.
-% If denoise_flag = 1 and rician_corr_flag = 0, use the denoised
-% volume 4D_dn.nii.
-% Otherwise use 4D.nii.
 
 if options.gibbs_corr_flag == 1
-    fprintf('Correcting for Gibbs artifact...  ')
-    DN=spm_read_vols(spm_vol(fullfile(dki1_dir, current_4D_file)));
+    fprintf('Correcting for Gibbs ringing artifact...  ')
 
-    list=dir(fullfile(dki1_dir,'*00*'));
-    [dim1,dim2,dim3,dim4]=size(DN);
-    parfor j=1:dim4
-        img(:,:,:,j)=unring(DN(:,:,:,j));
-        hdr=spm_vol(fullfile(dki1_dir,[list(j).name]));
-        hdr.dt=[16 0];
-        int=img(:,:,:,j);
-        int(isnan(int))=0;
-        spm_write_vol(hdr,int);
+    % Generate the output file name from appending '_gr' to
+    % the input file name, before the '.nii'
+    [curr_path, curr_name, curr_ext] = fileparts(current_4D_file);
+    gibbs_corrected_file = [curr_name '_gr' curr_ext];
+
+    command=['/usr/local/mrtrix3/bin/mrdegibbs ' current_4D_file ' ' gibbs_corrected_file];
+    [status,cmdout] = system(command);
+    if status == 0
+        fprintf('done.\n')
+    else
+        fprintf('\nAn error occurred. Output of mrdegibbs command:\n');
+        cmdout
+        error('Error running mrdegibbs.')
     end
+    current_4D_file = gibbs_corrected_file;  % The file being processed is now the Gibbs corrected file
 
-    fprintf('done.\n')
 else
     error('Not correcting for Gibbs artifact -- not supported yet')
 end
+
+%--------------------------------------------------------------------------
+% Split preprocessed 4D file into several 3D dki_vol#.nii files
+%--------------------------------------------------------------------------
+
+copyfile(current_4D_file, dki_file);
+
+% for separate b0
+% Vdir = dir(fullfile(b0_dir, '*.nii'));
+% V=fullfile(b0_dir, Vdir(1).name);
+% Vo = spm_file_split(V, b0_dir);
+
+V=fullfile(dki1_dir, dki_file);
+Vo = spm_file_split(V, dki1_dir);
 
 %--------------------------------------------------------------------------
 % Read DICOM headers from the DICOM files in basedir
