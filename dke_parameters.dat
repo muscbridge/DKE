@@ -66,7 +66,7 @@ dti_method.noise_tolerance = 0.09;          		% threshold for outlier detection 
  
 % diffusion-weighted image filtering
 
-fwhm_img = 1.25 * [2.7 2.7 2.7];            		% full width at half maximum (FWHM) (in mm) of Gaussian kernel for smoothing diffusion-weighted images (default: 1.25 * voxel size); a zero value indicates no smoothing
+fwhm_img = 0;            		% full width at half maximum (FWHM) (in mm) of Gaussian kernel for smoothing diffusion-weighted images (default: 0); a zero value indicates no smoothing
  
 % Rician noise subtraction
 
