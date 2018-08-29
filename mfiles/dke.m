@@ -66,6 +66,21 @@ if exist('fn_noise','var')  % DPL 8/29/18
     end
 end
 
+if exist('fwhm_noise','var')  % DPL 8/29/18
+    if fwhm_noise ~= 0
+        fprintf('Warning: fwhm_noise specified in parameter file is no longer used\n')
+        fprintf('         Setting fwhm_noise = 0\n')
+        fprintf('         Correction of Rician bias now uses noise map from denoising preprocessing step\n')
+        fprintf('         To correct for Rician bias, set\n')
+        fprintf('             preprocess_options.denoise_flag = 1\n')
+        fprintf('             preprocess_options.rician_corr_flag = 1\n')
+        fprintf('         in parameter file\n\n')
+        fwhm_noise = 0;
+    end
+else
+    fwhm_noise = 0;
+end
+
 % -------------------------------------------
 % Output file names
 % -------------------------------------------
