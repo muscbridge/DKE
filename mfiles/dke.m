@@ -6,7 +6,7 @@ function dke(fn_params)
 
 % Author: Ali Tabesh
 % Version: 2.6.0
-% Last modified: 11/5/2014 by EM
+% Last modified: 8/29/18 by DPL
 
 % -------------------------------------------
 % Constants
@@ -160,11 +160,12 @@ for isubject = 1:length(subject_list)
     end
     fn_out_struc_subject.dtype_out = fn_out_struc.dtype_out;
     
-    if ~isempty(fn_noise)
-        fn_subject_noise = fullfile(dir_subj, fn_noise);
-    else
+% DPL 8/29/18  Comment out the old Rician bias correction code
+%    if ~isempty(fn_noise)
+%        fn_subject_noise = fullfile(dir_subj, fn_noise);
+%    else
         fn_subject_noise = '';
-    end
+%    end
     
     if strcmpi(preprocess_options.format, 'dicom')
         eval(['!dke_preprocess_dicom "' dir_subj '" "' fn_params '"']);

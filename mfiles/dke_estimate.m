@@ -1564,7 +1564,9 @@ function y = filter_img_set(x, siz_x, fn_noise, s_x, s_n, v)
 %               contain the b = b_1 images, and so on.
 
 % Author: Ali Tabesh
-% Last modified: 05/25/12
+% Last modified: 8/29/18 by DPL
+%    - Comment out the old Rician bias correction code
+%    - Leave in the Gaussian smoothing code
 
 % initialize
 
@@ -1572,22 +1574,22 @@ nimg = size(x, 4);
 
 % read and optionally filter noise image
 
-if ~isempty(fn_noise)
-    if exist(fn_noise, 'file')
-        [hdr, n] = read_nii(fn_noise);
-        if any(hdr.dim(2:4) ~= siz_x)
-            error('Noise image and diffusion-weighted images have different dimensions!')
-        end
-    else
-        error('Noise image file %s does not exist!', fn_noise)
-    end
-else
-    n = zeros(siz_x);
-end
+%if ~isempty(fn_noise)
+%    if exist(fn_noise, 'file')
+%        [hdr, n] = read_nii(fn_noise);
+%        if any(hdr.dim(2:4) ~= siz_x)
+%            error('Noise image and diffusion-weighted images have different dimensions!')
+%        end
+%    else
+%        error('Noise image file %s does not exist!', fn_noise)
+%    end
+%else
+%    n = zeros(siz_x);
+%end
 
-if s_n ~= 0
-    n = gaussian_smooth(n, s_n, v);
-end
+%if s_n ~= 0
+%    n = gaussian_smooth(n, s_n, v);
+%end
 
 % filter diffusion-weighted images
 y = zeros(nimg, numel(x(:, :, :, 1)));
@@ -1597,7 +1599,8 @@ for i = 1:nimg
         x(:, :, :, i) = gaussian_smooth(squeeze(x(:, :, :, i)), s_x, v);
     end
     tmp = x(:, :, :, i);
-    y(i, :) = sqrt((tmp(:)) .^ 2 - (n(:)) .^ 2)';
+%    y(i, :) = sqrt((tmp(:)) .^ 2 - (n(:)) .^ 2)';
+    y(i, :) = abs(tmp(:))';    % DPL 8/29/18: Replacing last line
 end
 
 
