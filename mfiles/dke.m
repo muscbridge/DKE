@@ -53,6 +53,19 @@ else
 subject_list={''};
 end
 
+if exist('fn_noise','var')  % DPL 8/29/18
+    if ~strcmp(fn_noise, '')
+        fprintf('Warning: Noise map specified in parameter file is no longer used\n')
+        fprintf('         Setting fn_noise = ''''\n')
+        fprintf('         Correction of Rician bias now uses noise map from denoising preprocessing step\n')
+        fprintf('         To correct for Rician bias, set\n')
+        fprintf('             preprocess_options.denoise_flag = 1\n')
+        fprintf('             preprocess_options.rician_corr_flag = 1\n')
+        fprintf('         in parameter file\n\n')
+        fn_noise = '';
+    end
+end
+
 % -------------------------------------------
 % Output file names
 % -------------------------------------------
