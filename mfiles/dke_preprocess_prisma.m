@@ -82,7 +82,7 @@ mkdir(nifti_dir);
 b0_dir = fullfile(nifti_dir, 'B0');
 mkdir(b0_dir);
 
-eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
+eval(['!/Applications/MRIcroGL/dcm2niix -f %d ' basedir])
 
 % move new NIfTI files to subdirectories of nifti_dir
 
@@ -92,8 +92,8 @@ eval(['!/Applications/MRIcroGL/dcm2niix -f %p ' basedir])
 
 dki1_dir = fullfile(nifti_dir, 'DKI1');
 mkdir(dki1_dir);
-file_in=dir(fullfile(basedir, '*DKI*.nii'));
-in=fullfile(basedir, file_in(1).name);
+file1 = [options.series_description{1} '.nii'];
+in=fullfile(basedir, file1);
 out=fullfile(dki1_dir, dki_file);
 copyfile(in,out);
 
