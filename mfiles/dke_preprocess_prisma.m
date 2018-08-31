@@ -94,6 +94,10 @@ dki1_dir = fullfile(nifti_dir, 'DKI1');
 mkdir(dki1_dir);
 file1 = [options.series_description{1} '.nii'];
 in=fullfile(basedir, file1);
+if ~exist(in, 'file')
+    error_msg='The series_description parameter must match the series descriptions in the DICOM headers';
+    error('Input file %s does not exist.\n%s', in, error_msg)
+end
 out=fullfile(dki1_dir, dki_file);
 copyfile(in,out);
 
