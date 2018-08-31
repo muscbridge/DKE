@@ -46,6 +46,16 @@ if options.gibbs_corr_flag ~= 0 && options.gibbs_corr_flag ~= 1
     error('Invalid ''gibbs_corr_flag'' parameter! ''gibbs_corr_flag'' must be 0 or 1.')
 end
 
+expected_num_series = options.navg;      % Number of DKI series
+if options.extra_b0
+    expected_num_series = expected_num_series+1;  % Number of DKI + b=0 series
+end
+
+series_description_length = length(options.series_description);
+if series_description_length ~= expected_num_series
+    error('Length of series_description parameter does not match expected number of series.\nLength of series_description parameter = %d\nnavg = %d\nextra_b0 = %d\nExpected number of series = %d', series_description_length, options.navg, options.extra_b0, expected_num_series)
+end
+
 %--------------------------------------------------------------------------
 % Save current working directory
 %--------------------------------------------------------------------------
