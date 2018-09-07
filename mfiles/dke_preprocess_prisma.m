@@ -112,6 +112,20 @@ out=fullfile(dki1_dir, dki_file);
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
+% Read b values from the .bval file
+%--------------------------------------------------------------------------
+
+bval_file1 = [options.series_description{1} '.bval'];
+in=fullfile(basedir, bval_file1);
+if ~exist(in, 'file')
+    error_msg='Could not read b values.';
+    error('Input file %s does not exist.\n%s', in, error_msg)
+end
+bval_file_id = fopen(in);
+bvals = textscan(bval_file_id, '%s');
+fclose(bval_file_id);
+
+%--------------------------------------------------------------------------
 % Switch to dki1_dir and rename dki_file to current_4D_file
 %--------------------------------------------------------------------------
 
@@ -232,50 +246,15 @@ V=fullfile(dki1_dir, dki_file);
 Vo = spm_file_split(V, dki1_dir);
 
 %--------------------------------------------------------------------------
-% Read DICOM headers from the DICOM files in basedir
-%--------------------------------------------------------------------------
-
-P = spm_select('fplist', basedir, '.*');  % fplist: list w/ full path
-dicom_hdrs = spm_dicom_headers(P);
-
-%--------------------------------------------------------------------------
-% Get b values from the DICOM headers
-% For every image,
-%   If the sequence name from the header contains 'ep_b0', it's a b=0 image
-%   Otherwise if the sequence name contains 'ep', get the b value
-%     - b values are between 'b' and '#' (or 't') in the sequence name
-%   Otherwise (if the sequence name does not contain 'ep'), show an error
+% Rename NIfTI images -- append b values to file names (before .nii)
 %--------------------------------------------------------------------------
 
 list=dir(fullfile(dki1_dir,'*00*.nii'));
 
-for k=1:length(dicom_hdrs)
-    hdr = dicom_hdrs{k};
-    if ~isempty(strfind(hdr.SequenceName, 'ep_b0'))
-        bval = '0';
-    elseif ~isempty(strfind(hdr.SequenceName, 'ep'))
-        bval_start = strfind(hdr.SequenceName, 'b') + 1;
-        bval_end = strfind(hdr.SequenceName, '#') - 1;
-        if isempty(bval_end)      % if '#' was not found, assume that DWI was acquired for only one direction (transversal)
-            bval_end = strfind(hdr.SequenceName, 't') - 1;
-            if isempty(bval_end)  % if 't' was not found, issue an error message
-                error('Invalid gradient direction!')
-            end
-        end
-        bval = hdr.SequenceName(bval_start:bval_end);
-    else
-        error('Invalid sequence name in DICOM header! Sequence name must contain ''ep''!')
-    end
-    list(k).bval = bval;
-end
-
-%--------------------------------------------------------------------------
-% Rename NIfTI images (dki_vol#_bval.nii)
-%--------------------------------------------------------------------------
-
 for k=1:length(list)
-    [list(k).newname] = strrep(list(k).name, '.nii', ['_b' list(k).bval '.nii']);
-    movefile(fullfile(dki1_dir,list(k).name), fullfile(dki1_dir,list(k).newname));
+    [pathname, name, ext] = fileparts(list(k).name);
+    new_name = [name '_b' bvals{1}{k} ext];
+    movefile(list(k).name, fullfile(dki1_dir, new_name));
 end
 
 % move b0s to folder 'intermediate_processing/nifti/b0'
