@@ -251,6 +251,12 @@ Vo = spm_file_split(V, dki1_dir);
 
 list=dir(fullfile(dki1_dir,'*00*.nii'));
 
+num_images = length(list);
+num_bvals = length(bvals{1});
+if num_images ~= num_bvals
+    error('The number of 3D NIfTI images in %s (%d) does not match the number of b values in the .bval file (%d)', dki1_dir, num_images, num_bvals)
+end
+
 for k=1:length(list)
     [pathname, name, ext] = fileparts(list(k).name);
     new_name = [name '_b' bvals{1}{k} ext];
