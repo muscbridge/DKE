@@ -210,10 +210,7 @@ if options.gibbs_corr_flag == 1
     fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
     fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
 
-    % Generate the output file name from appending '_gr' to
-    % the input file name, before the '.nii'
-    [curr_path, curr_name, curr_ext] = fileparts(current_4D_file);
-    gibbs_corrected_file = [curr_name '_gr' curr_ext];
+    gibbs_corrected_file = append_to_name(current_4D_file, '_gr');
 
     command=['/usr/local/mrtrix3/bin/mrdegibbs ' current_4D_file ' ' gibbs_corrected_file];
     [status,cmdout] = system(command);
@@ -384,4 +381,14 @@ end;
 
 fn_other = char(fn_target, fn_other);
 spm_reslice(fn_other, wrtflg);
+
+
+%--------------------------------------------------------------------------
+% Generate a file name from appending a string to the input file name
+% before the extension
+%--------------------------------------------------------------------------
+function newname = append_to_name(oldname, appstring)
+
+[old_path, old_fn, old_ext] = fileparts(oldname);
+newname = fullfile(old_path, [old_fn appstring old_ext]);
 
