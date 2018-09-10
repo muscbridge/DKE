@@ -73,11 +73,8 @@ orig_dir = pwd;
 
 dki_file = 'dki.nii';
 current_4D_file = '4D.nii';
-denoised_file = '4D_dn.nii';
 noise_file = 'noise.nii';
 residual_file = 'res.nii';
-rician_corrected_file = '4D_dn_rc.nii';
-%gibbs_corrected_file = '4D_gc.nii';  % File name generated below
 
 %--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
@@ -149,6 +146,9 @@ movefile(in,out);
 
 if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...  ')
+
+    denoised_file = append_to_name(current_4D_file, '_dn');
+
     command=['/usr/local/mrtrix3/bin/dwidenoise ' current_4D_file  ' ' denoised_file ' -noise ' noise_file];
     [status,cmdout] = system(command);
     if status == 0
@@ -183,6 +183,9 @@ end
 if options.denoise_flag == 1
     if options.rician_corr_flag == 1
         fprintf('Correcting for Rician noise bias...  ')
+
+        rician_corrected_file = append_to_name(current_4D_file, '_rc');
+
         hdr_DN = spm_vol(current_4D_file);
         DN = spm_read_vols(hdr_DN);
         noise = spm_read_vols(spm_vol(noise_file));
