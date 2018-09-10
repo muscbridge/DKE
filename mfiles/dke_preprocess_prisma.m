@@ -258,9 +258,9 @@ if num_images ~= num_bvals
 end
 
 for k=1:length(list)
-    [pathname, name, ext] = fileparts(list(k).name);
-    new_name = [name '_b' bvals{1}{k} ext];
-    movefile(list(k).name, fullfile(dki1_dir, new_name));
+    app_string = ['_b' bvals{1}{k}];
+    new_name = append_to_name(list(k).name, app_string);
+    movefile(list(k).name, new_name);
 end
 
 % move b0s to folder 'intermediate_processing/nifti/b0'
