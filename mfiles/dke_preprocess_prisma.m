@@ -73,8 +73,6 @@ orig_dir = pwd;
 
 dki_file = 'dki.nii';
 current_4D_file = '4D.nii';
-noise_file = 'noise.nii';
-residual_file = 'res.nii';
 
 %--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
@@ -148,6 +146,8 @@ if options.denoise_flag == 1
     fprintf('Denoising data with dwidenoise (MRtrix)...  ')
 
     denoised_file = append_to_name(current_4D_file, '_dn');
+    noise_file = append_to_name(current_4D_file, '_noise');
+    residual_file = append_to_name(current_4D_file, '_res');
 
     command=['/usr/local/mrtrix3/bin/dwidenoise ' current_4D_file  ' ' denoised_file ' -noise ' noise_file];
     [status,cmdout] = system(command);
