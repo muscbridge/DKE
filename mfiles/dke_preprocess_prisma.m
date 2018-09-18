@@ -143,34 +143,7 @@ movefile(in,out);
 %--------------------------------------------------------------------------
 
 if options.denoise_flag == 1
-    fprintf('Denoising data with dwidenoise (MRtrix)...  ')
-
-    denoised_file = append_to_name(current_4D_file, '_dn');
-    noise_file = append_to_name(current_4D_file, '_noise');
-    residual_file = append_to_name(current_4D_file, '_res');
-
-    command=['/usr/local/mrtrix3/bin/dwidenoise ' current_4D_file  ' ' denoised_file ' -noise ' noise_file];
-    [status,cmdout] = system(command);
-    if status == 0
-        fprintf('done.\n')
-        fprintf('\t- denoised output file is %s.\n', denoised_file)
-        fprintf('\t- noise estimate output file is %s.\n', noise_file)
-    else
-        fprintf('\nAn error occurred. Output of dwidenoise command:\n');
-        cmdout
-        error('Error running dwidenoise.')
-    end
-    fprintf('Calculating residuals with mrcalc (MRtrix)...  ')
-    command=['/usr/local/mrtrix3/bin/mrcalc ' current_4D_file  ' ' denoised_file ' -subtract ' residual_file];
-    [status,cmdout] = system(command);
-    if status == 0
-        fprintf('done.\n')
-        fprintf('\t- residual output file is %s.\n', residual_file)
-    else
-        fprintf('\nAn error occurred. Output of mrcalc command:\n');
-        cmdout
-        error('Error running mrcalc.')
-    end
+    [denoised_file, noise_file] = denoise(current_4D_file);
     current_4D_file = denoised_file;  % The file being processed is now the denoised file
 else
     fprintf('Not denoising data\n')
@@ -395,3 +368,37 @@ function newname = append_to_name(oldname, appstring)
 [old_path, old_fn, old_ext] = fileparts(oldname);
 newname = fullfile(old_path, [old_fn appstring old_ext]);
 
+
+%--------------------------------------------------------------------------
+% Denoise an image, estimate the noise map, and calculate the residual image
+%--------------------------------------------------------------------------
+function [denoised_file, noise_file] = denoise(image_file)
+
+denoised_file = append_to_name(image_file, '_dn');
+noise_file = append_to_name(image_file, '_noise');
+residual_file = append_to_name(image_file, '_res');
+
+fprintf('Denoising data with dwidenoise (MRtrix)...  ')
+command=['/usr/local/mrtrix3/bin/dwidenoise ' image_file  ' ' denoised_file ' -noise ' noise_file];
+[status,cmdout] = system(command);
+if status == 0
+    fprintf('done.\n')
+    fprintf('\t- denoised output file is %s.\n', denoised_file)
+    fprintf('\t- noise estimate output file is %s.\n', noise_file)
+else
+    fprintf('\nAn error occurred. Output of dwidenoise command:\n');
+    cmdout
+    error('Error running dwidenoise.')
+end
+
+fprintf('Calculating residuals with mrcalc (MRtrix)...  ')
+command=['/usr/local/mrtrix3/bin/mrcalc ' image_file  ' ' denoised_file ' -subtract ' residual_file];
+[status,cmdout] = system(command);
+if status == 0
+    fprintf('done.\n')
+    fprintf('\t- residual output file is %s.\n', residual_file)
+else
+    fprintf('\nAn error occurred. Output of mrcalc command:\n');
+    cmdout
+    error('Error running mrcalc.')
+end
