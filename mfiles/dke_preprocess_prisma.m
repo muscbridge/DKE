@@ -155,19 +155,7 @@ end
 
 if options.denoise_flag == 1
     if options.rician_corr_flag == 1
-        fprintf('Correcting for Rician noise bias...  ')
-
-        rician_corrected_file = append_to_name(current_4D_file, '_rc');
-
-        hdr_DN = spm_vol(current_4D_file);
-        DN = spm_read_vols(hdr_DN);
-        noise = spm_read_vols(spm_vol(noise_file));
-        DN = sqrt(DN.^2 - noise.^2);
-        DN = real(DN);
-        DN(isnan(DN)) = 0;
-        make_4D_nii(hdr_DN, DN, rician_corrected_file);
-        fprintf('done.\n')
-        fprintf('\t- Rician noise bias corrected output file is %s.\n', rician_corrected_file)
+        rician_corrected_file = rician_bias_correct(current_4D_file, noise_file);
         current_4D_file = rician_corrected_file;  % The file being processed is now the Rician bias corrected file
     else
         fprintf('Not correcting for Rician noise bias\n')
@@ -402,3 +390,22 @@ else
     cmdout
     error('Error running mrcalc.')
 end
+
+
+%--------------------------------------------------------------------------
+% Correct for Rician noise bias
+%--------------------------------------------------------------------------
+function rician_corrected_file = rician_bias_correct(image_file, noise_file)
+
+rician_corrected_file = append_to_name(image_file, '_rc');
+
+fprintf('Correcting for Rician noise bias...  ')
+hdr_DN = spm_vol(image_file);
+DN = spm_read_vols(hdr_DN);
+noise = spm_read_vols(spm_vol(noise_file));
+DN = sqrt(DN.^2 - noise.^2);
+DN = real(DN);
+DN(isnan(DN)) = 0;
+make_4D_nii(hdr_DN, DN, rician_corrected_file);
+fprintf('done.\n')
+fprintf('\t- Rician noise bias corrected output file is %s.\n', rician_corrected_file)
