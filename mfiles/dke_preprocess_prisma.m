@@ -171,23 +171,8 @@ end
 %--------------------------------------------------------------------------
 
 if options.gibbs_corr_flag == 1
-    fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
-    fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
-
-    gibbs_corrected_file = append_to_name(current_4D_file, '_gr');
-
-    command=['/usr/local/mrtrix3/bin/mrdegibbs ' current_4D_file ' ' gibbs_corrected_file];
-    [status,cmdout] = system(command);
-    if status == 0
-        fprintf('done.\n')
-        fprintf('\t- Gibbs ringing artifact corrected output file is %s.\n', gibbs_corrected_file)
-    else
-        fprintf('\nAn error occurred. Output of mrdegibbs command:\n');
-        cmdout
-        error('Error running mrdegibbs.')
-    end
+    gibbs_corrected_file = gibbs_ringing_correct(current_4D_file);
     current_4D_file = gibbs_corrected_file;  % The file being processed is now the Gibbs corrected file
-
 else
     fprintf('Not correcting for Gibbs artifact\n')
 end
@@ -409,3 +394,24 @@ DN(isnan(DN)) = 0;
 make_4D_nii(hdr_DN, DN, rician_corrected_file);
 fprintf('done.\n')
 fprintf('\t- Rician noise bias corrected output file is %s.\n', rician_corrected_file)
+
+
+%--------------------------------------------------------------------------
+% Correct for Rician noise bias
+%--------------------------------------------------------------------------
+function gibbs_corrected_file = gibbs_ringing_correct(image_file)
+
+gibbs_corrected_file = append_to_name(image_file, '_gr');
+
+fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
+fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
+command=['/usr/local/mrtrix3/bin/mrdegibbs ' image_file ' ' gibbs_corrected_file];
+[status,cmdout] = system(command);
+if status == 0
+    fprintf('done.\n')
+    fprintf('\t- Gibbs ringing artifact corrected output file is %s.\n', gibbs_corrected_file)
+else
+    fprintf('\nAn error occurred. Output of mrdegibbs command:\n');
+    cmdout
+    error('Error running mrdegibbs.')
+end
