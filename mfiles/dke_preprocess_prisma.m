@@ -143,8 +143,7 @@ movefile(in,out);
 %--------------------------------------------------------------------------
 
 if options.denoise_flag == 1
-    [denoised_file, noise_file] = denoise(current_4D_file);
-    current_4D_file = denoised_file;  % The file being processed is now the denoised file
+    [current_4D_file, noise_file] = denoise(current_4D_file);
 else
     fprintf('Not denoising data\n')
 end
@@ -155,8 +154,7 @@ end
 
 if options.denoise_flag == 1
     if options.rician_corr_flag == 1
-        rician_corrected_file = rician_bias_correct(current_4D_file, noise_file);
-        current_4D_file = rician_corrected_file;  % The file being processed is now the Rician bias corrected file
+        current_4D_file = rician_bias_correct(current_4D_file, noise_file);
     else
         fprintf('Not correcting for Rician noise bias\n')
     end
@@ -171,8 +169,7 @@ end
 %--------------------------------------------------------------------------
 
 if options.gibbs_corr_flag == 1
-    gibbs_corrected_file = gibbs_ringing_correct(current_4D_file);
-    current_4D_file = gibbs_corrected_file;  % The file being processed is now the Gibbs corrected file
+    current_4D_file = gibbs_ringing_correct(current_4D_file);
 else
     fprintf('Not correcting for Gibbs artifact\n')
 end
