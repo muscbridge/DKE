@@ -74,7 +74,6 @@ orig_dir = pwd;
 % after each preprocessing step
 %--------------------------------------------------------------------------
 
-dki_file = 'dki.nii';
 current_4D_file = '4D.nii';
 
 %--------------------------------------------------------------------------
@@ -106,7 +105,7 @@ if ~exist(in, 'file')
     error_msg='The series_description parameter must match the series descriptions in the DICOM headers';
     error('Input file %s does not exist.\n%s', in, error_msg)
 end
-out=fullfile(dki1_dir, dki_file);
+out=fullfile(dki1_dir, current_4D_file);
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
@@ -124,7 +123,7 @@ bvals = textscan(bval_file_id, '%s');
 fclose(bval_file_id);
 
 %--------------------------------------------------------------------------
-% Switch to dki1_dir and rename dki_file to current_4D_file
+% Switch to dki1_dir
 %--------------------------------------------------------------------------
 
 % for separate b0
@@ -133,13 +132,10 @@ fclose(bval_file_id);
 % Vo = spm_file_split(V, b0_dir);
 
 cd(dki1_dir);
+
 %   Vdir = dir('*.nii');
 %   V=fullfile(dki1_dir, Vdir(1).name);
 %   Vo = spm_file_split(V,dki1_dir);
-
-in=fullfile(dki1_dir, dki_file);
-out=fullfile(dki1_dir, current_4D_file);
-movefile(in,out);
 
 %--------------------------------------------------------------------------
 % Denoise if denoise_flag = 1
@@ -181,6 +177,7 @@ end
 % Split preprocessed 4D file into several 3D dki_vol#.nii files
 %--------------------------------------------------------------------------
 
+dki_file = 'dki.nii';
 copyfile(current_4D_file, dki_file);
 
 % for separate b0
