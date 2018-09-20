@@ -66,17 +66,6 @@ end
 orig_dir = pwd;
 
 %--------------------------------------------------------------------------
-% Set file names
-%
-% current_4D_file is the name of the file being preprocessed with denoising,
-% Rician bias correction, and Gibbs ringing artifact correction (depending
-% on settings of flags in the preprocess_options struct) and changes
-% after each preprocessing step
-%--------------------------------------------------------------------------
-
-current_4D_file = '4D.nii';
-
-%--------------------------------------------------------------------------
 % Convert DICOM images to NIfTI format
 %--------------------------------------------------------------------------
 
@@ -99,8 +88,13 @@ eval(['!/Applications/MRIcroGL/dcm2niix -f %d ' basedir])
 
 dki1_dir = fullfile(nifti_dir, 'DKI1');
 mkdir(dki1_dir);
-file1 = [options.series_description{1} '.nii'];
-in=fullfile(basedir, file1);
+
+% current_4D_file is the name of the file being preprocessed with denoising,
+% Rician bias correction, and Gibbs ringing artifact correction (depending
+% on settings of flags in the preprocess_options struct) and changes
+% after each preprocessing step
+current_4D_file = [options.series_description{1} '.nii'];
+in=fullfile(basedir, current_4D_file);
 if ~exist(in, 'file')
     error_msg='The series_description parameter must match the series descriptions in the DICOM headers';
     error('Input file %s does not exist.\n%s', in, error_msg)
@@ -112,8 +106,8 @@ copyfile(in,out);
 % Read b values from the .bval file
 %--------------------------------------------------------------------------
 
-bval_file1 = [options.series_description{1} '.bval'];
-in=fullfile(basedir, bval_file1);
+bval_file = [options.series_description{1} '.bval'];
+in=fullfile(basedir, bval_file);
 if ~exist(in, 'file')
     error_msg='Could not read b values.';
     error('Input file %s does not exist.\n%s', in, error_msg)
