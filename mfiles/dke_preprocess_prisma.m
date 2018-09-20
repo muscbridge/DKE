@@ -394,7 +394,7 @@ fprintf('\t- Rician noise bias corrected output file is %s.\n', rician_corrected
 
 
 %--------------------------------------------------------------------------
-% Correct for Rician noise bias
+% Correct for Gibbs ringing artifact
 %--------------------------------------------------------------------------
 function gibbs_corrected_file = gibbs_ringing_correct(image_file)
 
