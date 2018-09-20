@@ -1,6 +1,9 @@
 function dke_preprocess_prisma(basedir, fn_params)
 
-% dke_preprocess_prisma Preprocess diffusional kurtosis imaging data (convert Siemens Prisma DICOM to NIfTI, coregister diffusion-weighted images, average images)
+% dke_preprocess_prisma Preprocess diffusional kurtosis imaging data
+% (convert DICOM to NIfTI; optionally denoise, correct for Rician noise bias,
+% and correct for Gibbs ringing artifact; coregister diffusion-weighted images;
+% average images)
 
 %--------------------------------------------------------------------------
 % Check inputs
