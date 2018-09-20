@@ -186,7 +186,7 @@ Vo = spm_file_split(V, dki1_dir);
 % Rename NIfTI images -- append b values to file names (before .nii)
 %--------------------------------------------------------------------------
 
-list=dir(fullfile(dki1_dir,'*00*.nii'));
+list=dir(fullfile(dki1_dir,'dki_*00*.nii'));
 
 num_images = length(list);
 num_bvals = length(bvals{1});
