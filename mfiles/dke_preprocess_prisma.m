@@ -271,9 +271,11 @@ spm_write_vol(hdr, imgavg);
 % Move DKI images and make 4D NIfTI images
 %--------------------------------------------------------------------------
 copyfile(fullfile(dki1_dir, '*00*'), combined_dir);
-files = dir(fullfile(combined_dir, '*.nii'));
+cd(combined_dir);
+files = dir('*.nii');
+
 make_4D_nii(combined_dir, {files.name}, '4D.nii');
-movefile(fullfile(combined_dir, '4D.nii'), fullfile(dke_dir, '4D.nii'))
+movefile('4D.nii', fullfile(dke_dir, '4D.nii'))
 
 img=spm_read_vols(spm_vol(fullfile(dke_dir, '4D.nii')));
 img(isnan(img))=0;
