@@ -274,12 +274,14 @@ copyfile(fullfile(dki1_dir, '*00*'), combined_dir);
 cd(combined_dir);
 files = dir('*.nii');
 
-make_4D_nii(combined_dir, {files.name}, '4D.nii');
-movefile('4D.nii', fullfile(dke_dir, '4D.nii'))
-
-img=spm_read_vols(spm_vol(fullfile(dke_dir, '4D.nii')));
-img(isnan(img))=0;
-make_4D_nii(spm_vol(fullfile(dke_dir, '4D.nii')), img, '4D.nii');
+for j = 1:length(files)
+    hdr = spm_vol(files(j).name);
+    img = spm_read_vols(hdr);
+    img(isnan(img)) = 0;
+    hdr.fname = fullfile(dke_dir, '4D.nii');
+    hdr.n = [j, 1];
+    spm_write_vol(hdr, img);
+end
 
 %--------------------------------------------------------------------------
 % Return to original working directory
