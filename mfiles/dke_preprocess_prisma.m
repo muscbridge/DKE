@@ -280,6 +280,7 @@ for j = 1:length(files)
     img(isnan(img)) = 0;
     hdr.fname = fullfile(dke_dir, '4D.nii');
     hdr.n = [j, 1];
+    hdr.dt=[64 0];
     spm_write_vol(hdr, img);
 end
 
