@@ -387,7 +387,14 @@ noise = spm_read_vols(spm_vol(noise_file));
 DN = sqrt(DN.^2 - noise.^2);
 DN = real(DN);
 DN(isnan(DN)) = 0;
-make_4D_nii(hdr_DN, DN, rician_corrected_file);
+
+hdr_DN(1).fname = rician_corrected_file;
+hdr_DN(1).dt = [64 0];
+for j = 1:length(hdr_DN)
+    hdr_DN(1).n = [j, 1];
+    spm_write_vol(hdr_DN(1), DN(:, :, :, j));
+end
+
 fprintf('done.\n')
 fprintf('\t- Rician noise bias corrected output file is %s.\n', rician_corrected_file)
 
