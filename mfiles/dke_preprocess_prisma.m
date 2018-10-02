@@ -262,7 +262,7 @@ imgavg = imgavg / (length(list));
 combined_dir = fullfile(nifti_dir, 'combined');
 mkdir(combined_dir);
 
-hdr.dt=[16 0];
+hdr.dt=[64 0];
 hdr.fname = fullfile(combined_dir, 'b0_avg.nii');
 imgavg(isnan(imgavg))=0;
 spm_write_vol(hdr, imgavg);
