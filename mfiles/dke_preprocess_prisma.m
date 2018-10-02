@@ -408,7 +408,7 @@ gibbs_corrected_file = append_to_name(image_file, '_gr');
 
 fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
 fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
-command=['/usr/local/mrtrix3/bin/mrdegibbs ' image_file ' ' gibbs_corrected_file];
+command=['/usr/local/mrtrix3/bin/mrdegibbs -datatype float64 ' image_file ' ' gibbs_corrected_file];
 [status,cmdout] = system(command);
 if status == 0
     fprintf('done.\n')
