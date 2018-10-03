@@ -233,8 +233,8 @@ dke_dir = fullfile(b12root, 'dke');
 mkdir(dke_dir);
 
 cd(basedir);
-name=dir('*.bvec');
-A=importdata([name(1).name]);
+bvec_file = [options.series_description{1} '.bvec'];
+A=importdata(bvec_file);
 B=A(:,any(A));
 Gradient=B';
 Gradient1=Gradient(1:(round(end/2)),:);
