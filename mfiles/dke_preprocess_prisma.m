@@ -49,6 +49,12 @@ if options.gibbs_corr_flag ~= 0 && options.gibbs_corr_flag ~= 1
     error('Invalid ''gibbs_corr_flag'' parameter! ''gibbs_corr_flag'' must be 0 or 1.')
 end
 
+if options.rician_corr_flag == 1 && options.denoise_flag == 0
+    fprintf('Will not correct for Rician noise bias (denoise_flag = 0)\n')
+    fprintf('- Setting Rician bias correction flag to 0\n')
+    options.rician_corr_flag = 0;
+end
+
 expected_num_series = options.navg;      % Number of DKI series
 if options.extra_b0
     expected_num_series = expected_num_series+1;  % Number of DKI + b=0 series
@@ -159,16 +165,10 @@ end
 % Correct for Rician noise bias if rician_corr_flag = 1 and denoise_flag = 1
 %--------------------------------------------------------------------------
 
-if options.denoise_flag == 1
-    if options.rician_corr_flag == 1
-        current_4D_file = rician_bias_correct(current_4D_file, noise_file);
-    else
-        fprintf('Not correcting for Rician noise bias\n')
-    end
+if options.rician_corr_flag == 1
+    current_4D_file = rician_bias_correct(current_4D_file, noise_file);
 else
-    if options.rician_corr_flag == 1
-        fprintf('Not correcting for Rician noise bias (denoise_flag = 0)\n')
-    end
+    fprintf('Not correcting for Rician noise bias\n')
 end
 
 %--------------------------------------------------------------------------
