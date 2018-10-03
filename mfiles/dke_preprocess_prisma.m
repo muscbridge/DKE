@@ -226,21 +226,6 @@ for l=1:length(list)
 end
 
 %--------------------------------------------------------------------------
-% Make gradient file
-%--------------------------------------------------------------------------
-
-dke_dir = fullfile(b12root, 'dke');
-mkdir(dke_dir);
-
-cd(basedir);
-bvec_file = [options.series_description{1} '.bvec'];
-A=importdata(bvec_file);
-B=A(:,any(A));
-Gradient=B';
-Gradient1=Gradient(1:(round(end/2)),:);
-save(fullfile(dke_dir, 'gradient_dke.txt'),'Gradient1','-ASCII')
-
-%--------------------------------------------------------------------------
 % Coregister b0s to b0
 %--------------------------------------------------------------------------
 
@@ -288,6 +273,9 @@ copyfile(fullfile(dki1_dir, '*00*'), combined_dir);
 cd(combined_dir);
 files = dir('*.nii');
 
+dke_dir = fullfile(b12root, 'dke');
+mkdir(dke_dir);
+
 for j = 1:length(files)
     hdr = spm_vol(files(j).name);
     img = spm_read_vols(hdr);
@@ -297,6 +285,18 @@ for j = 1:length(files)
     hdr.dt=[64 0];
     spm_write_vol(hdr, img);
 end
+
+%--------------------------------------------------------------------------
+% Make gradient file
+%--------------------------------------------------------------------------
+
+cd(basedir);
+bvec_file = [options.series_description{1} '.bvec'];
+A=importdata(bvec_file);
+B=A(:,any(A));
+Gradient=B';
+Gradient1=Gradient(1:(round(end/2)),:);
+save(fullfile(dke_dir, 'gradient_dke.txt'),'Gradient1','-ASCII')
 
 %--------------------------------------------------------------------------
 % Return to original working directory
