@@ -55,6 +55,10 @@ if options.rician_corr_flag == 1 && options.denoise_flag == 0
     options.rician_corr_flag = 0;
 end
 
+if options.gibbs_corr_flag == 1
+    fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
+end
+
 expected_num_series = options.navg;      % Number of DKI series
 if options.extra_b0
     expected_num_series = expected_num_series+1;  % Number of DKI + b=0 series
@@ -420,7 +424,6 @@ function gibbs_corrected_file = gibbs_ringing_correct(image_file)
 
 gibbs_corrected_file = append_to_name(image_file, '_gr');
 
-fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
 fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
 command=['/usr/local/mrtrix3/bin/mrdegibbs -datatype float64 ' image_file ' ' gibbs_corrected_file];
 [status,cmdout] = system(command);
