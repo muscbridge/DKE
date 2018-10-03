@@ -78,7 +78,21 @@ mkdir(nifti_dir);
 b0_dir = fullfile(nifti_dir, 'B0');
 mkdir(b0_dir);
 
-eval(['!/Applications/MRIcroGL/dcm2niix -f %d ' basedir])
+fprintf('Converting from DICOM to NIfTI with dcm2niix (MRIcroGL)...  ')
+command=['/Applications/MRIcroGL/dcm2niix -f %d ' basedir];
+[status,cmdout] = system(command);
+if status == 0
+    fprintf('done.\n')
+    list=dir(fullfile(basedir,'*.nii'));
+    fprintf('\t- NIfTI output:\n');
+    for i=1:length(list)
+        fprintf('\t  %s\n', list(i).name)
+    end
+else
+    fprintf('\nAn error occurred. Output of dcm2niix command:\n');
+    cmdout
+    error('Error running dcm2niix.')
+end
 
 % move new NIfTI files to subdirectories of nifti_dir
 
