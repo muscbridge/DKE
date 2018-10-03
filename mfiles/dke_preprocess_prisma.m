@@ -161,8 +161,6 @@ cd(dki1_dir);
 
 if options.denoise_flag == 1
     [current_4D_file, noise_file] = denoise(current_4D_file);
-else
-    fprintf('Not denoising data\n')
 end
 
 %--------------------------------------------------------------------------
@@ -171,8 +169,6 @@ end
 
 if options.rician_corr_flag == 1
     current_4D_file = rician_bias_correct(current_4D_file, noise_file);
-else
-    fprintf('Not correcting for Rician noise bias\n')
 end
 
 %--------------------------------------------------------------------------
@@ -181,13 +177,13 @@ end
 
 if options.gibbs_corr_flag == 1
     current_4D_file = gibbs_ringing_correct(current_4D_file);
-else
-    fprintf('Not correcting for Gibbs artifact\n')
 end
 
 %--------------------------------------------------------------------------
 % Split preprocessed 4D file into several 3D dki_vol#.nii files
 %--------------------------------------------------------------------------
+
+fprintf('Splitting 4D file into 3D files\n')
 
 dki_file = 'dki.nii';
 copyfile(current_4D_file, dki_file);
@@ -203,6 +199,8 @@ Vo = spm_file_split(V, dki1_dir);
 %--------------------------------------------------------------------------
 % Rename NIfTI images -- append b values to file names (before .nii)
 %--------------------------------------------------------------------------
+
+fprintf('Renaming image files to include b values\n')
 
 list=dir(fullfile(dki1_dir,'dki_*00*.nii'));
 
@@ -250,6 +248,9 @@ end
 %--------------------------------------------------------------------------
 % Average b0's
 %--------------------------------------------------------------------------
+
+fprintf('Averaging b=0 files\n')
+
 list = dir(fullfile(b0_dir, '*.nii'));
 hdr = spm_vol(fullfile(b0_dir, list(1).name));
 
@@ -273,26 +274,34 @@ spm_write_vol(hdr, imgavg);
 %--------------------------------------------------------------------------
 % Move DKI images and make 4D NIfTI images
 %--------------------------------------------------------------------------
+
 copyfile(fullfile(dki1_dir, '*00*'), combined_dir);
 cd(combined_dir);
 files = dir('*.nii');
 
+fprintf('Assembling 3D volumes into final 4D image\n')
+
 dke_dir = fullfile(b12root, 'dke');
 mkdir(dke_dir);
+final_image = fullfile(dke_dir, '4D.nii');
 
 for j = 1:length(files)
     hdr = spm_vol(files(j).name);
     img = spm_read_vols(hdr);
     img(isnan(img)) = 0;
-    hdr.fname = fullfile(dke_dir, '4D.nii');
+    hdr.fname = final_image;
     hdr.n = [j, 1];
     hdr.dt=[64 0];
     spm_write_vol(hdr, img);
 end
 
+fprintf('- Image is %s\n', final_image)
+
 %--------------------------------------------------------------------------
 % Make gradient file
 %--------------------------------------------------------------------------
+
+fprintf('Creating gradient vector file\n')
 
 cd(basedir);
 bvec_file = [options.series_description{1} '.bvec'];
@@ -300,16 +309,15 @@ A=importdata(bvec_file);
 B=A(:,any(A));
 Gradient=B';
 Gradient1=Gradient(1:(round(end/2)),:);
-save(fullfile(dke_dir, 'gradient_dke.txt'),'Gradient1','-ASCII')
+gradient_file = fullfile(dke_dir, 'gradient_dke.txt');
+save(gradient_file, 'Gradient1', '-ASCII')
+fprintf('- Gradient vector file is %s\n', gradient_file)
 
 %--------------------------------------------------------------------------
 % Return to original working directory
 %--------------------------------------------------------------------------
 
 cd(orig_dir);
-
-
-fprintf('complete.\n')
 
 
 %--------------------------------------------------------------------------
