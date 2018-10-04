@@ -173,15 +173,15 @@ cd(dki_dir);
 % Denoise, correct for Rician noise bias, correct for Gibbs ringing artifact
 %--------------------------------------------------------------------------
 
-if options.denoise_flag == 1
+if options.denoise_flag
     [current_4D_file, noise_file] = denoise(current_4D_file);
 end
 
-if options.rician_corr_flag == 1
+if options.rician_corr_flag
     current_4D_file = rician_bias_correct(current_4D_file, noise_file);
 end
 
-if options.gibbs_corr_flag == 1
+if options.gibbs_corr_flag
     current_4D_file = gibbs_ringing_correct(current_4D_file);
 end
 
