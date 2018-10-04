@@ -25,7 +25,7 @@ end
 warning('off','all')
 
 %--------------------------------------------------------------------------
-% Read parameter file
+% Read parameter file, check settings of flags
 %--------------------------------------------------------------------------
 
 fid=fopen(fn_params);
@@ -110,6 +110,10 @@ end
 %     in=fullfile(basedir, '*B0*.nii');
 %     copyfile(in, b0_dir);
 
+%--------------------------------------------------------------------------
+% Copy file to preprocess to a new subdirectory
+%--------------------------------------------------------------------------
+
 dki1_dir = fullfile(nifti_dir, 'DKI1');
 mkdir(dki1_dir);
 
@@ -156,24 +160,16 @@ cd(dki1_dir);
 %   Vo = spm_file_split(V,dki1_dir);
 
 %--------------------------------------------------------------------------
-% Denoise if denoise_flag = 1
+% Denoise, correct for Rician noise bias, correct for Gibbs ringing artifact
 %--------------------------------------------------------------------------
 
 if options.denoise_flag == 1
     [current_4D_file, noise_file] = denoise(current_4D_file);
 end
 
-%--------------------------------------------------------------------------
-% Correct for Rician noise bias if rician_corr_flag = 1 and denoise_flag = 1
-%--------------------------------------------------------------------------
-
 if options.rician_corr_flag == 1
     current_4D_file = rician_bias_correct(current_4D_file, noise_file);
 end
-
-%--------------------------------------------------------------------------
-% Correct for Gibbs ringing artifact
-%--------------------------------------------------------------------------
 
 if options.gibbs_corr_flag == 1
     current_4D_file = gibbs_ringing_correct(current_4D_file);
@@ -401,6 +397,7 @@ end
 
 %--------------------------------------------------------------------------
 % Correct for Rician noise bias
+% Set voxels where noise > signal to 0
 %--------------------------------------------------------------------------
 function rician_corrected_file = rician_bias_correct(image_file, noise_file)
 
