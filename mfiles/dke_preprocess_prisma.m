@@ -124,14 +124,16 @@ end
 % Copy file to preprocess to a new subdirectory
 %--------------------------------------------------------------------------
 
-dki_dir = fullfile(nifti_dir, 'DKI1');
+iavg = 1;
+
+dki_dir = fullfile(nifti_dir, ['DKI' num2str(iavg)]);
 mkdir(dki_dir);
 
 % current_4D_file is the name of the file being preprocessed with denoising,
 % Rician bias correction, and Gibbs ringing artifact correction (depending
 % on settings of flags in the preprocess_options struct) and changes
 % after each preprocessing step
-current_4D_file = [options.series_description{1} '.nii'];
+current_4D_file = [options.series_description{iavg} '.nii'];
 in=fullfile(basedir, current_4D_file);
 if ~exist(in, 'file')
     error_msg='The series_description parameter must match the series descriptions in the DICOM headers';
@@ -140,11 +142,13 @@ end
 out=fullfile(dki_dir, current_4D_file);
 copyfile(in,out);
 
+fprintf('Preprocessing image file %s\n', out);
+
 %--------------------------------------------------------------------------
 % Read b values from the .bval file
 %--------------------------------------------------------------------------
 
-bval_file = [options.series_description{1} '.bval'];
+bval_file = [options.series_description{iavg} '.bval'];
 in=fullfile(basedir, bval_file);
 if ~exist(in, 'file')
     error_msg='Could not read b values.';
