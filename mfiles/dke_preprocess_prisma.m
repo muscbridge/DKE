@@ -111,6 +111,20 @@ end
 %     copyfile(in, b0_dir);
 
 %--------------------------------------------------------------------------
+% Copy extra b=0 file into a separate subdirectory and split into 3D images
+%--------------------------------------------------------------------------
+
+if options.extra_b0
+    extra_b0_dir = fullfile(nifti_dir, 'extra_b0');
+    mkdir(extra_b0_dir);
+    extra_b0_file = [options.series_description{end} '.nii'];
+    extra_b0_file_path = fullfile(basedir, extra_b0_file);
+    fprintf('Copying %s to %s and splitting into 3D volumes\n', extra_b0_file_path, extra_b0_dir);
+    copyfile(extra_b0_file_path, extra_b0_dir);
+    extra_b0_3D_files = spm_file_split(extra_b0_file_path, extra_b0_dir);
+end
+
+%--------------------------------------------------------------------------
 % Copy file to preprocess to a new subdirectory
 %--------------------------------------------------------------------------
 
