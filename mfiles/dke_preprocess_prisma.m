@@ -124,8 +124,8 @@ end
 % Copy file to preprocess to a new subdirectory
 %--------------------------------------------------------------------------
 
-dki1_dir = fullfile(nifti_dir, 'DKI1');
-mkdir(dki1_dir);
+dki_dir = fullfile(nifti_dir, 'DKI1');
+mkdir(dki_dir);
 
 % current_4D_file is the name of the file being preprocessed with denoising,
 % Rician bias correction, and Gibbs ringing artifact correction (depending
@@ -137,7 +137,7 @@ if ~exist(in, 'file')
     error_msg='The series_description parameter must match the series descriptions in the DICOM headers';
     error('Input file %s does not exist.\n%s', in, error_msg)
 end
-out=fullfile(dki1_dir, current_4D_file);
+out=fullfile(dki_dir, current_4D_file);
 copyfile(in,out);
 
 %--------------------------------------------------------------------------
@@ -155,7 +155,7 @@ bvals = textscan(bval_file_id, '%s');
 fclose(bval_file_id);
 
 %--------------------------------------------------------------------------
-% Switch to dki1_dir
+% Switch to dki_dir
 %--------------------------------------------------------------------------
 
 % for separate b0
@@ -163,11 +163,11 @@ fclose(bval_file_id);
 % V=fullfile(b0_dir, Vdir(1).name);
 % Vo = spm_file_split(V, b0_dir);
 
-cd(dki1_dir);
+cd(dki_dir);
 
 %   Vdir = dir('*.nii');
-%   V=fullfile(dki1_dir, Vdir(1).name);
-%   Vo = spm_file_split(V,dki1_dir);
+%   V=fullfile(dki_dir, Vdir(1).name);
+%   Vo = spm_file_split(V,dki_dir);
 
 %--------------------------------------------------------------------------
 % Denoise, correct for Rician noise bias, correct for Gibbs ringing artifact
@@ -199,8 +199,8 @@ copyfile(current_4D_file, dki_file);
 % V=fullfile(b0_dir, Vdir(1).name);
 % Vo = spm_file_split(V, b0_dir);
 
-V=fullfile(dki1_dir, dki_file);
-Vo = spm_file_split(V, dki1_dir);
+V=fullfile(dki_dir, dki_file);
+Vo = spm_file_split(V, dki_dir);
 
 %--------------------------------------------------------------------------
 % Rename NIfTI images -- append b values to file names (before .nii)
@@ -208,12 +208,12 @@ Vo = spm_file_split(V, dki1_dir);
 
 fprintf('Renaming image files to include b values\n')
 
-list=dir(fullfile(dki1_dir,'dki_*00*.nii'));
+list=dir(fullfile(dki_dir,'dki_*00*.nii'));
 
 num_images = length(list);
 num_bvals = length(bvals{1});
 if num_images ~= num_bvals
-    error('The number of 3D NIfTI images in %s (%d) does not match the number of b values in the .bval file (%d)', dki1_dir, num_images, num_bvals)
+    error('The number of 3D NIfTI images in %s (%d) does not match the number of b values in the .bval file (%d)', dki_dir, num_images, num_bvals)
 end
 
 for k=1:length(list)
@@ -225,10 +225,10 @@ end
 % move b0s to folder 'intermediate_processing/nifti/b0'
 
 clear list
-list=dir(fullfile(dki1_dir,'*b0*.nii'));
+list=dir(fullfile(dki_dir,'*b0*.nii'));
 
 for l=1:length(list)
-    in=fullfile(dki1_dir,list(l).name);
+    in=fullfile(dki_dir,list(l).name);
     out=fullfile(b0_dir, list(l).name);
     movefile(in,out);
 end
@@ -239,15 +239,15 @@ end
 
 %ONLY USE WITH INTERLEAVED B0S
 % dirb0=dir(fullfile(b0_dir, '*.nii'));
-% dirdki=dir(fullfile(dki1_dir, '*.nii'));
+% dirdki=dir(fullfile(dki_dir, '*.nii'));
 % 
 % fprintf('Co-registering images...\n')
 % fn_source = fullfile(b0_dir, dirb0(1).name); % source file is the first b = 0 image in the series returned by the operating system
 % 
-%             fn_target = fullfile(dki1_dir, dirdki(1).name);
+%             fn_target = fullfile(dki_dir, dirdki(1).name);
 %             M=coregister(fn_target, fn_source, b0_dir, '.nii');
 % 
-% delete(fullfile(dki1_dir, 'r*.nii'))
+% delete(fullfile(dki_dir, 'r*.nii'))
 % movefile(fullfile(b0_dir, 'r*.nii'), fullfile(b12root, 'nifti/B0_coreg'));
 % fprintf('Co-registration complete.\n')
 
@@ -281,15 +281,15 @@ spm_write_vol(hdr, imgavg);
 % Move DKI images and make 4D NIfTI images
 %--------------------------------------------------------------------------
 
-copyfile(fullfile(dki1_dir, '*00*'), combined_dir);
+copyfile(fullfile(dki_dir, '*00*'), combined_dir);
 cd(combined_dir);
 files = dir('*.nii');
 
 fprintf('Assembling 3D volumes into final 4D image\n')
 
-dke_dir = fullfile(b12root, 'dke');
-mkdir(dke_dir);
-final_image = fullfile(dke_dir, '4D.nii');
+final_dir = fullfile(b12root, 'dke');
+mkdir(final_dir);
+final_image = fullfile(final_dir, '4D.nii');
 
 for j = 1:length(files)
     hdr = spm_vol(files(j).name);
@@ -315,7 +315,7 @@ A=importdata(bvec_file);
 B=A(:,any(A));
 Gradient=B';
 Gradient1=Gradient(1:(round(end/2)),:);
-gradient_file = fullfile(dke_dir, 'gradient_dke.txt');
+gradient_file = fullfile(final_dir, 'gradient_dke.txt');
 save(gradient_file, 'Gradient1', '-ASCII')
 fprintf('- Gradient vector file is %s\n', gradient_file)
 
