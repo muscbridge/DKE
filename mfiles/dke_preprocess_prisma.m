@@ -115,8 +115,9 @@ if options.extra_b0
     mkdir(extra_b0_dir);
     extra_b0_file = [options.series_description{end} '.nii'];
     extra_b0_file_path = fullfile(basedir, extra_b0_file);
-    fprintf('Copying %s to %s and splitting into 3D volumes\n', extra_b0_file_path, extra_b0_dir);
+    fprintf('Copying %s to %s\n', extra_b0_file_path, extra_b0_dir)
     copyfile(extra_b0_file_path, extra_b0_dir);
+    fprintf('and splitting into 3D volumes\n')
     extra_b0_3D_files = spm_file_split(extra_b0_file_path, extra_b0_dir);
 end
 
@@ -193,7 +194,7 @@ end
 % Split preprocessed 4D file into several 3D dki_vol#.nii files
 %--------------------------------------------------------------------------
 
-fprintf('Splitting 4D file into 3D files\n')
+fprintf('- Splitting 4D file into 3D files\n')
 
 dki_file = 'dki.nii';
 copyfile(current_4D_file, dki_file);
@@ -210,7 +211,7 @@ Vo = spm_file_split(V, dki_dir);
 % Rename NIfTI images -- append b values to file names (before .nii)
 %--------------------------------------------------------------------------
 
-fprintf('Renaming image files to include b values\n')
+fprintf('- Renaming image files to include b values\n')
 
 list=dir(fullfile(dki_dir,'dki_*00*.nii'));
 
@@ -259,7 +260,7 @@ end
 % Average b0's
 %--------------------------------------------------------------------------
 
-fprintf('Averaging b=0 files\n')
+fprintf('- Averaging b=0 files\n')
 
 list = dir(fullfile(b0_dir, '*.nii'));
 hdr = spm_vol(fullfile(b0_dir, list(1).name));
@@ -305,7 +306,7 @@ for j = 1:length(files)
     spm_write_vol(hdr, img);
 end
 
-fprintf('- Image is %s\n', final_image)
+fprintf('\t- Image is %s\n', final_image)
 
 %--------------------------------------------------------------------------
 % Make gradient file
@@ -321,7 +322,7 @@ Gradient=B';
 Gradient1=Gradient(1:(round(end/2)),:);
 gradient_file = fullfile(final_dir, 'gradient_dke.txt');
 save(gradient_file, 'Gradient1', '-ASCII')
-fprintf('- Gradient vector file is %s\n', gradient_file)
+fprintf('\t- Gradient vector file is %s\n', gradient_file)
 
 %--------------------------------------------------------------------------
 % Return to original working directory
@@ -383,7 +384,7 @@ denoised_file = append_to_name(image_file, '_dn');
 noise_file = append_to_name(image_file, '_noise');
 residual_file = append_to_name(image_file, '_res');
 
-fprintf('Denoising data with dwidenoise (MRtrix)...  ')
+fprintf('- Denoising data with dwidenoise (MRtrix)...  ')
 command=['/usr/local/mrtrix3/bin/dwidenoise ' image_file  ' ' denoised_file ' -noise ' noise_file];
 [status,cmdout] = system(command);
 if status == 0
@@ -396,7 +397,7 @@ else
     error('Error running dwidenoise.')
 end
 
-fprintf('Calculating residuals with mrcalc (MRtrix)...  ')
+fprintf('- Calculating residuals with mrcalc (MRtrix)...  ')
 command=['/usr/local/mrtrix3/bin/mrcalc ' image_file  ' ' denoised_file ' -subtract ' residual_file];
 [status,cmdout] = system(command);
 if status == 0
@@ -417,7 +418,7 @@ function rician_corrected_file = rician_bias_correct(image_file, noise_file)
 
 rician_corrected_file = append_to_name(image_file, '_rc');
 
-fprintf('Correcting for Rician noise bias...  ')
+fprintf('- Correcting for Rician noise bias...  ')
 hdr = spm_vol(image_file);
 signal = spm_read_vols(hdr);
 noise = spm_read_vols(spm_vol(noise_file));
@@ -443,8 +444,8 @@ function gibbs_corrected_file = gibbs_ringing_correct(image_file)
 
 gibbs_corrected_file = append_to_name(image_file, '_gr');
 
-fprintf('NOTE: You should not use mrdegibbs on partial Fourier data\n')
-fprintf('Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
+fprintf('- NOTE: You should not use mrdegibbs on partial Fourier data\n')
+fprintf('- Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
 command=['/usr/local/mrtrix3/bin/mrdegibbs -datatype float64 ' image_file ' ' gibbs_corrected_file];
 [status,cmdout] = system(command);
 if status == 0
