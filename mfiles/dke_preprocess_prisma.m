@@ -404,18 +404,18 @@ function rician_corrected_file = rician_bias_correct(image_file, noise_file)
 rician_corrected_file = append_to_name(image_file, '_rc');
 
 fprintf('Correcting for Rician noise bias...  ')
-hdr_DN = spm_vol(image_file);
-DN = spm_read_vols(hdr_DN);
+hdr = spm_vol(image_file);
+signal = spm_read_vols(hdr);
 noise = spm_read_vols(spm_vol(noise_file));
-DN = sqrt(DN.^2 - noise.^2);
-DN = real(DN);
-DN(isnan(DN)) = 0;
+signal = sqrt(signal.^2 - noise.^2);
+signal = real(signal);
+signal(isnan(signal)) = 0;
 
-hdr_DN(1).fname = rician_corrected_file;
-hdr_DN(1).dt = [64 0];
-for j = 1:length(hdr_DN)
-    hdr_DN(1).n = [j, 1];
-    spm_write_vol(hdr_DN(1), DN(:, :, :, j));
+hdr(1).fname = rician_corrected_file;
+hdr(1).dt = [64 0];
+for j = 1:length(hdr)
+    hdr(1).n = [j, 1];
+    spm_write_vol(hdr(1), signal(:, :, :, j));
 end
 
 fprintf('done.\n')
