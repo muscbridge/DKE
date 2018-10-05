@@ -213,23 +213,20 @@ Vo = spm_file_split(V, dki_dir);
 
 fprintf('- Renaming image files to include b values\n')
 
-list=dir(fullfile(dki_dir,'dki_*00*.nii'));
-
-num_images = length(list);
+num_images = length(Vo);
 num_bvals = length(bvals{1});
 if num_images ~= num_bvals
     error('The number of 3D NIfTI images in %s (%d) does not match the number of b values in the .bval file (%d)', dki_dir, num_images, num_bvals)
 end
 
-for k=1:length(list)
+for k=1:length(Vo)
     app_string = ['_b' bvals{1}{k}];
-    new_name = append_to_name(list(k).name, app_string);
-    movefile(list(k).name, new_name);
+    new_name = append_to_name(Vo(k).fname, app_string);
+    movefile(Vo(k).fname, new_name);
 end
 
 % move b0s to folder 'intermediate_processing/nifti/b0'
 
-clear list
 list=dir(fullfile(dki_dir,'*b0*.nii'));
 
 for l=1:length(list)
