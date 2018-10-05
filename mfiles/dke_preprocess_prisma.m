@@ -81,9 +81,6 @@ mkdir(b12root);
 nifti_dir = fullfile(b12root, 'nifti');
 mkdir(nifti_dir);
 
-b0_dir = fullfile(nifti_dir, 'B0');
-mkdir(b0_dir);
-
 fprintf('Converting from DICOM to NIfTI with dcm2niix (MRIcroGL)...  ')
 command=['/Applications/MRIcroGL/dcm2niix -f %d ' basedir];
 [status,cmdout] = system(command);
@@ -129,6 +126,9 @@ iavg = 1;
 
 dki_dir = fullfile(nifti_dir, ['DKI' num2str(iavg)]);
 mkdir(dki_dir);
+
+b0_dir = fullfile(nifti_dir, ['DKI' num2str(iavg) '_b0']);
+mkdir(b0_dir);
 
 % current_4D_file is the name of the file being preprocessed with denoising,
 % Rician bias correction, and Gibbs ringing artifact correction (depending
@@ -225,7 +225,9 @@ for k=1:length(Vo)
     movefile(Vo(k).fname, new_name);
 end
 
-% move b0s to folder 'intermediate_processing/nifti/b0'
+%--------------------------------------------------------------------------
+% Move b0s to a separate folder
+%--------------------------------------------------------------------------
 
 list=dir(fullfile(dki_dir,'*b0*.nii'));
 
