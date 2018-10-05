@@ -82,7 +82,7 @@ nifti_dir = fullfile(b12root, 'nifti');
 mkdir(nifti_dir);
 
 fprintf('Converting from DICOM to NIfTI with dcm2niix (MRIcroGL)...  ')
-command=['/Applications/MRIcroGL/dcm2niix -f %d ' basedir];
+command=['dcm2niix -f %d ' basedir];
 [status,cmdout] = system(command);
 if status == 0
     fprintf('done.\n')
@@ -384,7 +384,7 @@ noise_file = append_to_name(image_file, '_noise');
 residual_file = append_to_name(image_file, '_res');
 
 fprintf('- Denoising data with dwidenoise (MRtrix)...  ')
-command=['/usr/local/mrtrix3/bin/dwidenoise ' image_file  ' ' denoised_file ' -noise ' noise_file];
+command=['dwidenoise ' image_file  ' ' denoised_file ' -noise ' noise_file];
 [status,cmdout] = system(command);
 if status == 0
     fprintf('done.\n')
@@ -397,7 +397,7 @@ else
 end
 
 fprintf('- Calculating residuals with mrcalc (MRtrix)...  ')
-command=['/usr/local/mrtrix3/bin/mrcalc ' image_file  ' ' denoised_file ' -subtract ' residual_file];
+command=['mrcalc ' image_file  ' ' denoised_file ' -subtract ' residual_file];
 [status,cmdout] = system(command);
 if status == 0
     fprintf('done.\n')
@@ -445,7 +445,7 @@ gibbs_corrected_file = append_to_name(image_file, '_gr');
 
 fprintf('- NOTE: You should not use mrdegibbs on partial Fourier data\n')
 fprintf('- Correcting for Gibbs ringing artifact with mrdegibbs (MRtrix)...  ')
-command=['/usr/local/mrtrix3/bin/mrdegibbs -datatype float64 ' image_file ' ' gibbs_corrected_file];
+command=['mrdegibbs -datatype float64 ' image_file ' ' gibbs_corrected_file];
 [status,cmdout] = system(command);
 if status == 0
     fprintf('done.\n')
