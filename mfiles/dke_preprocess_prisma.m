@@ -124,10 +124,10 @@ end
 
 iavg = 1;
 
-dki_dir = fullfile(nifti_dir, ['DKI' num2str(iavg)]);
+dki_dir = fullfile(nifti_dir, ['dki_avg' num2str(iavg)]);
 mkdir(dki_dir);
 
-b0_dir = fullfile(nifti_dir, ['DKI' num2str(iavg) '_b0']);
+b0_dir = fullfile(nifti_dir, ['dki_avg' num2str(iavg) '_b0']);
 mkdir(b0_dir);
 
 % current_4D_file is the name of the file being preprocessed with denoising,
