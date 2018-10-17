@@ -1,4 +1,4 @@
-function dke(varargin)
+function dke(fn_params)
 
 % dke Diffusional Kurtosis Estimator
 %   inputs are dicom or nifti diffusion-weighted images 
@@ -19,38 +19,22 @@ internal_flag = 1;
 % -------------------------------------------
 % Check inputs
 % -------------------------------------------
-mid = 'dke:badinput';
 
 [dkeVersion, dkeDate] = GetDKEVersion;
 fprintf('%s, %s\n', dkeVersion, dkeDate)
 
-%Check for correct number of arguments
-narginchk(0,1);
 
-switch (nargin)
-%no arguments passed; prompt for file selection
-case 0
-    [name,path] = uigetfile('*.txt');
-    if ~ischar(name)
-        msg = 'Parameters file not selected';
-        ME = MException(mid,msg);
-        throw(ME)
-    end
-    fn_params = fullfile(path,name);
-case 1
-    if ~ischar(varargin{1})
-        msg = 'Input filename is a bad data type';
-        ME = MException(mid,msg);
-        throw(ME);
-    elseif  ~exist(varargin{1}, 'file')
-        msg = sprintf('File %s does not exist',varargin{1});
-        ME = MException(mid,msg);
-        throw(ME);
-    end
-otherwise
-    msg = 'This error should be impossible!';
-    ME = MException(mid,msg);
-    throw(ME);
+if nargin ~= 1
+    fprintf('\n')
+    fprintf('Usage: dke paramsfile\n')
+    fprintf('paramsfile  DKE processing parameters file\n\n')
+    return
+end
+
+if ~exist(fn_params, 'file')
+    fprintf('\n')
+    fprintf('Input parameters file %s does not exist!\n\n', fn_params)
+    return
 end
 
 % -------------------------------------------
