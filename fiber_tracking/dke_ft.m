@@ -1,4 +1,4 @@
-function dke_ft(FT_parameters)
+function dke_ft(varargin)
 %dke_ft(FT_PARAMETERS) optimizes the kurtosis dODF and performs
 %DKI-based white matter fiber tractography
 %
@@ -13,6 +13,48 @@ function dke_ft(FT_parameters)
 %July 2015
 
 FTVersion = GetFTVersion;
+
+%Validate inputs
+narginchk(0,1)
+
+mid = 'dke:badinput';
+
+switch nargin
+%no input
+case 0
+    [name,path] = uigetfile('*.txt','Select a parameters file');
+    %0 returned if no selection
+    if ~ischar(name)
+        msg = 'You did not select a file';
+        ME = MException(mid,msg);
+        throw(ME);
+    end
+
+    %selection is made, check for existence
+    FT_parameters = fullfile(path,name);
+    if ~exist(fullfile(path,name))
+        msg = sprintf('File %s does not exist!',name);
+        ME = MException(mid,msg);
+        throw(ME);
+    end
+case 1
+    %check to make sure input is a char
+    if ~ischar(varargin{1})
+        msg = 'Incorrect input data type; char expected';
+        ME = MException(mid,msg);
+        throw(ME);
+    %check to make sure input exists
+    elseif ~exist(varargin{1})
+        msg = sprintf('File %s not found!',varargin{1});
+        ME = MException(mid,msg);
+        throw(ME);
+    end
+otherwise
+    msg = 'Error should be impossible!';
+    ME = MException(mid,msg);
+    throw(ME);
+end
+
 
 %Get input parameters-------------------------------------------------------
 input_struc = readvariables(FT_parameters);
