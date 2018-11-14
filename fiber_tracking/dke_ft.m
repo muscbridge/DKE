@@ -457,7 +457,6 @@ if input_struc.odf_optimization
     end
 
 end %FINISH PROCESSING ODF-------------------------------------------------
-Ringose3
 
 %Perform Tractography
 if input_struc.tractography_flg
