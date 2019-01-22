@@ -258,7 +258,7 @@ if input_struc.odf_optimization
                 end
 
                 %Convert to Cartesian
-                DKI_V = [sin(DKI_V(:,1)).*cos(DKI_V(:,2)), sin(DKI_V(:,1)).*sin(DKI_V(:,2)), cos(DKI_V(:,1))]'; 
+%                DKI_V = [sin(DKI_V(:,1)).*cos(DKI_V(:,2)), sin(DKI_V(:,1)).*sin(DKI_V(:,2)), cos(DKI_V(:,1))]'; 
 
                 %Sort by magnitude
                 [DKI_max idx] = sort(DKI_max,'descend');
