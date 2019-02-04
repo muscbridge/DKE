@@ -34,11 +34,22 @@ fn_out_struc.FT_dti='DTI';
 
 fnames = fieldnames(fn_out_struc);
 
-%Check for parallel computing
-try if matlabpool('size')==0; matlabpool open; fprintf('\n'); end; 
-catch ME
-    ME.message;
-end 
+% Start a parallel pool, unless one has already been started
+% Before MATLAB 2013b (MATLAB version 8.2), 'matlabpool open' starts a parallel pool
+% For MATLAB 2013b and later, 'gcp' creates a parallel pool if one currently does not exist
+if verLessThan('matlab', '8.2')
+    try
+        if matlabpool('size')==0; matlabpool open; fprintf('\n'); end
+    catch ME
+        disp(ME.message)
+    end 
+else
+    try
+        poolobj=gcp; fprintf('\n');
+    catch ME
+        disp(ME.message)
+    end 
+end
 
 warning('off','all')
 
@@ -321,8 +332,17 @@ if input_struc.odf_optimization
         %There is a potential memory leak on matlabs parallel computing
         %toolbox. This quick fix releases memory accumulated during the parfor
         %loop. 
-        if input_struc.release_memory==2; try matlabpool close; matlabpool open; catch ;end; end %#ok
-
+        if input_struc.release_memory==2
+            try
+                if verLessThan('matlab', '8.2')
+                    matlabpool close; matlabpool open;
+                else
+                    delete(poolobj); poolobj=gcp;
+                end
+            catch ME
+                disp(ME.message)
+            end
+        end
         if input_struc.make_fib_file
             %NOTE: In case images volumes were co-registered, some voxels  (particularly from the
             %first or last slice) may cause errors with the dODF calculation. For
@@ -484,7 +504,17 @@ end
 
 
 fprintf(repmat('\b',1,fpb))
-if input_struc.release_memory; try matlabpool close; matlabpool open; fprintf('\n'); catch ;end; end %#ok
+if input_struc.release_memory
+    try
+        if verLessThan('matlab', '8.2')
+            matlabpool close; matlabpool open; fprintf('\n');
+        else
+            delete(poolobj); poolobj=gcp; fprintf('\n');
+        end
+    catch ME
+        disp(ME.message)
+    end
+end
 fprintf('\nOptimization Complete...\n\n')
 diary off
 
