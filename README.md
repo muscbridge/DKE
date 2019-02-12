@@ -13,8 +13,6 @@ Diffusional Kurtosis Imaging (DKI) data.
 
 [DKE FAQs](http://academicdepartments.musc.edu/cbi/dki/faq.html)
 
-[KIN (Kurtosis Imaging Network)](http://academicdepartments.musc.edu/cbi/dki/kin.html)
-
 [DKI References](http://academicdepartments.musc.edu/cbi/dki/references.html)
 
 [DKE Forum on NITRC](https://www.nitrc.org/forum/?group_id=652)
