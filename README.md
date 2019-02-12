@@ -3,17 +3,15 @@ The Diffusional Kurtosis Estimator (DKE) is software for processing
 Diffusional Kurtosis Imaging (DKI) data. 
 
 ## Useful Links for DKE
-[Introduction to DKI](http://academicdepartments.musc.edu/cbi/dki/index.html)
+[Introduction to DKI](https://education.musc.edu/colleges/medicine/departments/centers/cbi/dki)
 
-[DKI Protocols](http://academicdepartments.musc.edu/cbi/dki/protocols.html)
+[DKI Protocols & Data Processing](https://education.musc.edu/colleges/medicine/departments/centers/cbi/dki/protocols)
 
-[DKI Data Processing](http://academicdepartments.musc.edu/cbi/dki/dke.html)
+[DKE Results](https://education.musc.edu/colleges/medicine/departments/centers/cbi/dki/results)
 
-[DKE Results](http://academicdepartments.musc.edu/cbi/dki/results.html)
+[DKE FAQs](https://education.musc.edu/colleges/medicine/departments/centers/cbi/dki/faqs)
 
-[DKE FAQs](http://academicdepartments.musc.edu/cbi/dki/faq.html)
-
-[DKI References](http://academicdepartments.musc.edu/cbi/dki/references.html)
+[DKI References](https://education.musc.edu/colleges/medicine/departments/centers/cbi/dki/references)
 
 [DKE Forum on NITRC](https://www.nitrc.org/forum/?group_id=652)
 
