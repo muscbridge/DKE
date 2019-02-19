@@ -25,7 +25,7 @@ copy of the source code to suit your own purposes.
 
 ### Executables
 The DKE executables for 32- and 64-bit Windows, 64-bit Linux, and 64-bit macOS 
-are temporarily unavailable from the MUSC CBI website.
+are available from [our DKE project pages on NITRC](https://www.nitrc.org/projects/dke/).
 
 ### Source Code
 The source code can be downloaded from this site using either the Downloads 
