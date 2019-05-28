@@ -29,16 +29,9 @@ are available from [our DKE project pages on NITRC](https://www.nitrc.org/projec
 
 ### Source Code
 The source code can be downloaded from this site using either the Downloads 
-menu or via "git clone" (if you have a git client installed). For example, 
-at the Linux or macOS command prompt:
-```
-$ git clone git@git.musc.edu:dal220/dke.git
-```
-If you download DKE via "git clone", you can later update to the latest 
-version on this site with "git pull":
-```
-$ git pull
-```
+menu or via "git clone" (if you have a git client installed). If you download
+DKE via "git clone", you can later update to the latest version on this site
+with "git pull".
 
 ## Prerequisites
 In order to run DKE from source code, you need to have MATLAB. The files
