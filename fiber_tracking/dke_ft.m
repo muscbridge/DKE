@@ -19,6 +19,7 @@ input_struc = readvariables(FT_parameters);
 
 %Create output structure---------------------------------------------------
 fn_out_struc.fib='dki';
+fn_out_struc.fib_dti='dti';
 fn_out_struc.gfa='gfa';
 fn_out_struc.nfd='nfd';
 fn_out_struc.odf_k_min='odf_k_min';
@@ -180,6 +181,9 @@ if input_struc.odf_optimization
         %Initialize .fib file
         if input_struc.make_fib_file == 1         
             save([fn_out_struc_subject.fib '.fib'], 'dimension', 'voxel_size', 'odf_vertices', 'odf_faces', '-v4')     
+            if FT_struc.output_DTI_trks
+            save([fn_out_struc_subject.fib_dti '.fib'], 'dimension', 'voxel_size', 'odf_vertices', 'odf_faces', '-v4')     
+            end
         end
 
     %Initialize output parameters
@@ -210,6 +214,10 @@ if input_struc.odf_optimization
 
         if input_struc.make_fib_file
             odfs = zeros(length(idx_fib),numel(idxn)); %initialize odf values to save
+            if FT_struc.output_DTI_trks
+            odfs_dti = zeros(length(idx_fib),numel(idxn)); %initialize odf values to save
+            end
+
         end
 
         %Re-Initialize variables for this iteration per  matlab parfor loop
@@ -303,7 +311,35 @@ if input_struc.odf_optimization
 
                 gfa_i = sqrt(1-sum(AREA.*DKI_P).^2/sum(AREA.*DKI_P.^2));
 
+                % Calculate gaussian dODF for .fib
+                if FT_struc.output_DTI_trks
+                D = [dt(1) dt(4) dt(5); dt(4) dt(2) dt(6); dt(5) dt(6) dt(3)]; %Diffusion Tensor
+                Davg = trace(D)/3;
+                U = Davg*D^-1;
 
+               U11 = U(1,1); U22 = U(2,2); U33 = U(3,3); 
+               U12 = U(1,2); U13 = U(1,3); U23 = U(2,3);                                                                  
+
+                fG = @(x,a)(1/((sin(x(1))*cos(x(2)))^2*U11+(sin(x(1))*sin(x(2)))^2*U22+cos(x(1))^2*U33+2*(sin(x(1))*cos(x(2)))*(sin(x(1))*sin(x(2)))*U12+...
+                2*(sin(x(1))*cos(x(2)))*cos(x(1))*U13+2*(sin(x(1))*sin(x(2)))*cos(x(1))*U23))^((a+1)/2);
+              %INITIALIZE OPTIMIZATION VARIABLES
+                DTI_P = zeros(size(S,1),1);   %ODF VALUES
+                    
+                for j = 1:size(S,1);                     
+                   
+%               %Diffusion Ellipsoid % in case anybody in the future wants
+%               to use the diffusion ellipsoid in stead of dODF 
+%               nj = [sin(S(j,1))*cos(S(j,2));sin(S(j,1))*sin(S(j,2));cos(S(j,1))];
+%               DTI_P(j) = fG(D,nj); 
+                    
+                %Gaussian dODF
+                DTI_P(j) = fG(S(j,:),input_struc.radial_weight);                    
+                    
+                end
+                
+                DTI_P = real(DTI_P);
+                end
+                
                 %SAVE THINGS
                 odf_kn{i} = DKI_V; 
                 odf_k_maxn{i} = DKI_max; 
@@ -321,11 +357,14 @@ if input_struc.odf_optimization
 
                 if input_struc.make_fib_file && input_struc.save_odfs
                     odfs(:,i) = DKI_P(idx_fib); 
+                    if FT_struc.output_DTI_trks
+                    odfs_dti(:,i)=DTI_P(idx_fib);
+                    end
                 end
               
 
             catch  ME
-                ME.message;
+                ME.message
             end
         end
                 
@@ -340,7 +379,7 @@ if input_struc.odf_optimization
                     delete(poolobj); poolobj=gcp;
                 end
             catch ME
-                disp(ME.message)
+                disp(ME.message);
             end
         end
         if input_struc.make_fib_file
@@ -367,7 +406,17 @@ if input_struc.odf_optimization
 
             eval(sprintf('odf%d=odfs;',n)) %Update odfn to new values
             save([fn_out_struc_subject.fib '.fib'],sprintf('odf%d',n),'-v4','-append');  %add odfn to .fib file
-            eval(sprintf('clear odf%d odfs;',n)) %clear up some memory for next time        
+            eval(sprintf('clear odf%d odfs;',n)) %clear up some memory for next time      
+            
+            if FT_struc.output_DTI_trks
+            % DTI fib file 
+            odfs_dti = odfs_dti(:,~x);
+            odfs_dti = input_struc.scale_odf.*bsxfun(@rdivide,odfs_dti,max(odfs_dti)); 
+            eval(sprintf('odf%d=odfs_dti;',n)) %Update odfn to new values
+            save([fn_out_struc_subject.fib_dti '.fib'],sprintf('odf%d',n),'-v4','-append');  %add odfn to .fib file
+            eval(sprintf('clear odf%d odfs_dti;',n)) %clear up some memory for next time      
+            end
+            
         end
 
 
@@ -441,8 +490,37 @@ if input_struc.odf_optimization
         dir2(:,idx_fa_fib) = permute(dirx(:,3,:),[1 3 2]);
         dir3(:,idx_fa_fib) = permute(dirx(:,4,:),[1 3 2]);
         dir4(:,idx_fa_fib) = permute(dirx(:,5,:),[1 3 2]);
-
+        
         save( [fn_out_struc_subject.fib '.fib'], 'dir0', 'dir1', 'dir2', 'dir3', 'dir4', 'fa0', 'fa1', 'fa2' ,'fa3', 'fa4', '-v4', '-append')
+       
+        if FT_struc.output_DTI_trks
+        C_DTI = permute(reshape(odf_d,dimension),permute_img); 
+        for i = inv_dim; C_DTI = flipdim(C_DTI,i); end
+        A_DTI = cell(size(idx_fa_fib)); 
+        [A_DTI{:}] = deal(C_DTI{idx_fa_fib}); 
+        A_DTI = cellfun(@(x)bsxfun(@times,x(permute_odf,:),invert_odf'),A_DTI,'UniformOutput',0); 
+        dirx_DTI = zeros(3,5,numel(idx_fa_fib));
+
+        parfor i = 1:length(idx_fa_fib)  
+            v_DTI=A_DTI{i};
+            diri_DTI = zeros(3,5);    
+            diri_DTI(:,1)=v_DTI;
+            dirx_DTI(:,:,i) = diri_DTI; 
+        end
+
+
+        dir0 = zeros(3,prod(dimension)); dir1 = dir0; dir2 = dir0; dir3 = dir0; dir4 = dir0; 
+
+        dir0(:,idx_fa_fib) = permute(dirx_DTI(:,1,:),[1 3 2]); 
+        dir1(:,idx_fa_fib) = permute(dirx_DTI(:,2,:),[1 3 2]);
+        dir2(:,idx_fa_fib) = permute(dirx_DTI(:,3,:),[1 3 2]);
+        dir3(:,idx_fa_fib) = permute(dirx_DTI(:,4,:),[1 3 2]);
+        dir4(:,idx_fa_fib) = permute(dirx_DTI(:,5,:),[1 3 2]);
+        
+        save( [fn_out_struc_subject.fib_dti '.fib'], 'dir0', 'dir1', 'dir2', 'dir3', 'dir4', 'fa0', 'fa1', 'fa2' ,'fa3', 'fa4', '-v4', '-append')
+        clear C_DTI A_DTI dirx_DTI
+        end
+        
         clear C A fa_fib fa0 fa1 fa2 fa3 fa4 dir0 dir1 dir2 dir3 dir4 fax dirx
 
     end
