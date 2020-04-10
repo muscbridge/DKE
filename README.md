@@ -105,3 +105,22 @@ ans =
 
 The MEX files can then be moved to the appropriate directory ending in "mex", 
 for example linux64mex if you are using 64-bit Linux.
+
+## Changelog
+
+### DKE v2.6.1
+
+**Added**:
+
+* DTI fib file output. If the flag output DTI tracks is on it will
+  automatically output the DTI.fib file to. The gaussian dODF is
+  used to visualize the ODFs but there is commented code in there to
+  change it to the elipsoid. The directions in the fib file for
+  tractography is the first eigenvector.
+
+**Changed**:
+
+* Updated DKE version and date-time strings
+
+**Removed**:
+* None
